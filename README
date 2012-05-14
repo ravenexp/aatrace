@@ -1,0 +1,25 @@
+aatrace - Yet another ASCII-art generator.
+
+1. Building
+
+$ make
+
+Tweak Makefile
+Repeat
+
+2. Usage
+
+Generate differentiated image:
+
+$ testdiff input.pgm output.pgm
+
+Generate ASCII text and rendered image:
+
+$ testconv input.pgm diffoutput.pgm font/font8x16.pgm output.txt output.pgm
+
+^^
+All arguments are required.
+
+All image files are in the Portable GrayMap (PGM) format.
+ImageMagick or netpbm may be used to generate input(s) and convert output(s)
+into something useable.
