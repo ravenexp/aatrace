@@ -3,7 +3,8 @@
 
 #define AATRACE_FONT_ASCII_OFFSET 32
 
-#define AATRACE_DIFF_SCALE 2
+#define AATRACE_DIFF_SCALE 4
+
 #define aatrace_diff aatrace_diff3
 
 typedef unsigned char pix_t;

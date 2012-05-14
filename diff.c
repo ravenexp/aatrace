@@ -10,7 +10,7 @@ void aatrace_diff2(pix_t* d, pix_t* s, int w, int h)
 			int D = abs(s[i + w] - s[i] + s[i + w + 1] - s[i + 1])
 			      + abs(s[i + 1] - s[i] + s[i + w + 1] - s[i + w]);
 
-			D *= AATRACE_DIFF_SCALE*2;
+			D = (D*AATRACE_DIFF_SCALE)/4;
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
@@ -29,7 +29,7 @@ void aatrace_diff3(pix_t* d, pix_t* s, int w, int h)
 				    +  s[i - w + 1] - s[i - w + 1]
 				    +  s[i + w + 1] - s[i + w - 1]);
 
-			D *= AATRACE_DIFF_SCALE;
+			D = (D*AATRACE_DIFF_SCALE)/8;
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
