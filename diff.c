@@ -26,7 +26,7 @@ void aatrace_diff3(pix_t* d, pix_t* s, int w, int h)
 				    +  s[i + w + 1] - s[i - w + 1])
 				+
 				abs(2*(s[i + 0 + 1] - s[i + 0 - 1])
-				    +  s[i - w + 1] - s[i - w + 1]
+				    +  s[i - w + 1] - s[i - w - 1]
 				    +  s[i + w + 1] - s[i + w - 1]);
 
 			D = (D*AATRACE_DIFF_SCALE)/8;
