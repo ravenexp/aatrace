@@ -12,6 +12,7 @@
 /* Differentiation kernel implementation
    diff2 - 2x2 flat top
    diff3 - 3x3 Sobel operator
+   diff4 - 4x4 [1 2 2 1]^2 operator
  */
 #define aatrace_diff aatrace_diff3
 
@@ -19,6 +20,7 @@ typedef unsigned char pix_t;
 
 void aatrace_diff2(pix_t* d, pix_t* s, int w, int h);
 void aatrace_diff3(pix_t* d, pix_t* s, int w, int h);
+void aatrace_diff4(pix_t* d, pix_t* s, int w, int h);
 
 int aatrace_match_tile(const pix_t* t, const pix_t* f,
 		       int w, int fw, int fh, int ch);

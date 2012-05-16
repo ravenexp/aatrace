@@ -33,3 +33,42 @@ void aatrace_diff3(pix_t* d, pix_t* s, int w, int h)
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
+
+static const int diff4_Kx[4][4] =
+{
+	{-1, -1,  1,  1},
+	{-2, -2,  2,  2},
+	{-2, -2,  2,  2},
+	{-1, -1,  1,  1}
+};
+
+static const int diff4_Ky[4][4] =
+{
+	{-1, -2, -2, -1},
+	{-1, -2, -2, -1},
+	{ 1,  2,  2,  1},
+	{ 1,  2,  2,  1}
+};
+
+void aatrace_diff4(pix_t* d, pix_t* s, int w, int h)
+{
+	int l, i;
+	int kl, kc;
+
+	for (l = 1; l < h - 2; l++)
+		for (i = l*w + 1; i < (l + 1)*w - 2; i++) {
+			int Dx = 0, Dy = 0;
+			int D;
+
+			for (kl = 0; kl < 4; kl++)
+				for (kc = 0; kc < 4; kc++) {
+					Dx += s[i + kl*w + kc]*diff4_Kx[kl][kc];
+					Dy += s[i + kl*w + kc]*diff4_Ky[kl][kc];
+			}
+
+			D = abs(Dx) + abs(Dy);
+
+			D = (D*AATRACE_DIFF_SCALE)/24;
+			d[i] = (D > 255) ? 255 : D;
+		}
+}
