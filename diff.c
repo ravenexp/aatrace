@@ -62,8 +62,10 @@ void aatrace_diff4(pix_t* d, pix_t* s, int w, int h)
 
 			for (kl = 0; kl < 4; kl++)
 				for (kc = 0; kc < 4; kc++) {
-					Dx += s[i + kl*w + kc]*diff4_Kx[kl][kc];
-					Dy += s[i + kl*w + kc]*diff4_Ky[kl][kc];
+					Dx += s[i + (kl - 1)*w + kc - 1]
+						* diff4_Kx[kl][kc];
+					Dy += s[i + (kl - 1)*w + kc - 1]
+						* diff4_Ky[kl][kc];
 			}
 
 			D = abs(Dx) + abs(Dy);
