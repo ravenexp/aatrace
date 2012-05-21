@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "aatrace.h"
 #include "pnm.h"
 
-int util_dump_text_file(FILE* f, const char* txt,
-			int twidth, int theight)
+int util_write_text(FILE* f, const char* txt, int twidth, int theight)
 {
 	int l;
 
@@ -18,17 +18,18 @@ int util_dump_text_file(FILE* f, const char* txt,
 	return (twidth + 1)*theight;
 }
 
-
-int util_dump_text_filename(const char* fname, const char* txt,
-			    int twidth, int theight)
+int util_store_text(const char* fname, const char* txt,
+		    int twidth, int theight)
 {
-	FILE* f;
+	FILE* f = stdout;
 
-	f = fopen(fname, "wb");
-	if (!f)
-		return -1;
+	if (strcmp(fname, "-")) {
+		f = fopen(fname, "wb");
+		if (!f)
+			return -1;
+	}
 
-	return util_dump_text_file(f, txt, twidth, theight);
+	return util_write_text(f, txt, twidth, theight);
 }
 
 pix_t* util_load_pic(const char* fname, int* pwidth, int* pheight)
@@ -37,7 +38,12 @@ pix_t* util_load_pic(const char* fname, int* pwidth, int* pheight)
 	pnm_file pnm;
 	pnm_type_t type;
 
-	pnm = pnm_filename_open(fname, &type, pwidth, pheight);
+	if (strcmp(fname, "-")) {
+		pnm = pnm_filename_open(fname, &type, pwidth, pheight);
+	} else {
+		pnm = pnm_file_open(stdin, &type, pwidth, pheight);
+	}
+
 	if (!pnm || type != PNM_TYPE_PGM)
 		return 0;
 
@@ -57,7 +63,12 @@ int util_store_pic(const char* fname, const pix_t* picbuf,
 	pnm_file pnm;
 	int written;
 
-	pnm = pnm_filename_create(fname, PNM_TYPE_PGM, width, height);
+	if (strcmp(fname, "-")) {
+		pnm = pnm_filename_create(fname, PNM_TYPE_PGM, width, height);
+	} else {
+		pnm = pnm_file_create(stdout, PNM_TYPE_PGM, width, height);
+	}
+
 	if (!pnm)
 		return -1;
 

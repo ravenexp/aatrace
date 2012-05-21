@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 			  width, height,
 			  fwidth, fheight, AATRACE_FONT_HEIGHT);
 
-	util_dump_text_filename(argv[4], txtbuf, twidth, theight);
+	util_store_text(argv[4], txtbuf, twidth, theight);
 
 	obuf = (pix_t*)malloc(width*height);
 	aatrace_render_pic(obuf, txtbuf, fbuf,
