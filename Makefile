@@ -3,7 +3,7 @@ CC = gcc
 CCLD = $(CC)
 CFLAGS = -std=c89 -O3 -g -Wall -Wextra -Wc++-compat
 
-all: testconv testdiff
+all: testdiff testconv testrender
 
 %.o: %.c *.h Makefile
 	$(CC) $(CFLAGS) -c $<
@@ -14,5 +14,8 @@ testdiff: testdiff.o pnm.o util.o diff.o
 testconv: testconv.o pnm.o util.o diff.o match.o render.o
 	$(CCLD) -o $@ $^
 
+testrender: testrender.o pnm.o util.o render.o
+	$(CCLD) -o $@ $^
+
 clean:
-	rm -f testdiff testconv *.o
+	rm -f testdiff testconv testrender *.o

@@ -1,6 +1,9 @@
 *.o
 *.exe
 *.plist
+
 testdiff
 testconv
-test
+testrender
+
+test/

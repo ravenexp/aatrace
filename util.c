@@ -4,6 +4,46 @@
 #include "aatrace.h"
 #include "pnm.h"
 
+char* util_read_text(FILE* f, int* ptwidth, int* ptheight)
+{
+	size_t sz = 0x1000;
+	char* txt = (char*)malloc(sz);
+	unsigned int w, l;
+
+	if (!fgets(txt, sz, f))
+		return 0;
+
+	w = strlen(txt) - 1;
+
+	for (l = 1; ; l++) {
+		if ((l + 1)*w > sz) {
+			sz *= 2;
+			txt = (char*)realloc(txt, sz);
+		}
+
+		if (!fgets(&txt[l*w], sz - l*w, f))
+			break;
+	}
+
+	*ptwidth = w;
+	*ptheight = l;
+
+	return txt;
+}
+
+char* util_load_text(const char* fname, int* ptwidth, int* ptheight)
+{
+	FILE* f = stdin;
+
+	if (strcmp(fname, "-")) {
+		f = fopen(fname, "rb");
+		if (!f)
+			return 0;
+	}
+
+	return util_read_text(f, ptwidth, ptheight);
+}
+
 int util_write_text(FILE* f, const char* txt, int twidth, int theight)
 {
 	int l;
