@@ -11,12 +11,16 @@ while (!works)
 
 Using convenience wrapper script:
 
-$ ./aaconvert.sh image.pgm
+$ ./aaconvert.sh image.pgm [diffscale]
 
 Generates image.diff.pgm, image.txt and image.txt.pgm files
 in the current directory.
 image.diff.pgm is an intermediate differentiated image output,
 image.txt is the text output and image.txt.pgm is the image output.
+
+diffscale is an optional parameter adjusting edge "brightness".
+Specify small integer in the range of 1..20 (approx).
+The current default is 4.
 
 AAFONT environment variable overrides the default the font image.
 
@@ -24,7 +28,7 @@ AAFONT environment variable overrides the default the font image.
 
 Generate differentiated image:
 
-$ ./testdiff image.pgm image.diff.pgm
+$ ./testdiff image.pgm image.diff.pgm [diffscale]
 
 Generate ASCII text file from the differentiated image:
 
@@ -48,10 +52,15 @@ convert output(s) into something more usable.
 
 3. Tweaking
 
+Tweaking command line parameters:
+
+Changing diffscale adjusts the amount of detail (and noise) that makes
+it into the final ASCII picture.
+Check generated .diff.pgm file to see the effect of the adjustments.
+
 Tweaking definitions in aatrace.h:
 
-Changing AATRACE_DIFF_SCALE (gradient map scaling)
-roughly adjust ASCII "brightness".
-Changing aatrace_diff (differentiation kernel size)
-adjust detail/noise sensitivity.
-Check generated .diff.pgm file to see the effect of the adjustments.
+Changing aatrace_diff (differentiation kernel size) adjust
+the detail/noise sensitivity level.
+Available kernel sizes: 2, 3, 4.
+The default is 3 (Sobel operator).

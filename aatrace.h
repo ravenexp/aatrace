@@ -7,7 +7,7 @@
 /* Gradiant map scale adjustment
    1 ::= normalized to the byte range
 */
-#define AATRACE_DIFF_SCALE 4
+#define AATRACE_DIFF_SCALE_DEFAULT 4
 
 /* Differentiation kernel implementation
    diff2 - 2x2 flat top
@@ -18,9 +18,12 @@
 
 typedef unsigned char pix_t;
 
-void aatrace_diff2(pix_t* d, pix_t* s, int w, int h);
-void aatrace_diff3(pix_t* d, pix_t* s, int w, int h);
-void aatrace_diff4(pix_t* d, pix_t* s, int w, int h);
+void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale);
+void aatrace_diff3(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale);
+void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale);
 
 int aatrace_match_tile(const pix_t* t, const pix_t* f,
 		       int w, int fw, int fh, int ch);

@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include "aatrace.h"
 
-void aatrace_diff2(pix_t* d, pix_t* s, int w, int h)
+void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale)
 {
 	int l, i;
 	unsigned int D;
@@ -11,12 +12,13 @@ void aatrace_diff2(pix_t* d, pix_t* s, int w, int h)
 			D = abs(s[i + w] - s[i] + s[i + w + 1] - s[i + 1])
 			  + abs(s[i + 1] - s[i] + s[i + w + 1] - s[i + w]);
 
-			D = (D*AATRACE_DIFF_SCALE)/4;
+			D = (D*scale)/4;
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
 
-void aatrace_diff3(pix_t* d, pix_t* s, int w, int h)
+void aatrace_diff3(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale)
 {
 	int l, i;
 	unsigned int D;
@@ -31,7 +33,7 @@ void aatrace_diff3(pix_t* d, pix_t* s, int w, int h)
 				+  s[i - w + 1] - s[i - w - 1]
 				+  s[i + w + 1] - s[i + w - 1]);
 
-			D = (D*AATRACE_DIFF_SCALE)/8;
+			D = (D*scale)/8;
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
@@ -52,7 +54,8 @@ static const int diff4_Ky[4][4] =
 	{ 1,  2,  2,  1}
 };
 
-void aatrace_diff4(pix_t* d, pix_t* s, int w, int h)
+void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
+		   unsigned int scale)
 {
 	int l, i;
 	int kl, kc;
@@ -71,7 +74,7 @@ void aatrace_diff4(pix_t* d, pix_t* s, int w, int h)
 			}
 
 			D = abs(Dx) + abs(Dy);
-			D = (D*AATRACE_DIFF_SCALE)/24;
+			D = (D*scale)/24;
 			d[i] = (D > 255) ? 255 : D;
 		}
 }
