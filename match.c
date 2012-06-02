@@ -12,9 +12,8 @@ void aatrace_blit_tile(pix_t* d, const pix_t* s,
 			d[l*fw + c] = s[l*sw + c];
 }
 
-static
-int aatrace_match_tile(const pix_t* t, const pix_t* f,
-		       int fw, int fh, int ch)
+int aatrace_match_tile_sad(const pix_t* t, const pix_t* f,
+			   int fw, int fh, int ch)
 {
 	int ft, cl, cc;
 	int minsad = 255*fw*ch;
@@ -29,6 +28,38 @@ int aatrace_match_tile(const pix_t* t, const pix_t* f,
 
 		if (sad < minsad) {
 			minsad = sad;
+			best_ft = ft;
+		}
+	}
+
+	return best_ft;
+}
+
+int aatrace_match_tile_sadasd(const pix_t* t, const pix_t* f,
+			      int fw, int fh, int ch)
+{
+	int ft, cl, cc;
+	int minsadasd = 2*255*fw*ch;
+	int best_ft = 0;
+
+	for (ft = 0; ft*ch < fh - ch + 1; ft++) {
+		int sad = 0;
+		int sd = 0;
+		int asd;
+
+		for (cl = 0; cl < ch; cl++)
+			for (cc = 0; cc < fw; cc++) {
+				int d;
+
+				d = t[cl*fw + cc] - f[(ft*ch + cl)*fw + cc];
+				sd += d;
+				sad += abs(d);
+			}
+
+		asd = abs(sd);
+
+		if (sad + asd < minsadasd) {
+			minsadasd = sad + asd;
 			best_ft = ft;
 		}
 	}

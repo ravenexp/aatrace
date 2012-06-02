@@ -16,6 +16,11 @@
  */
 #define AATRACE_DIFF_KERNEL_DEFAULT 3
 
+#define aatrace_match_tile aatrace_match_tile_sad
+/*
+#define aatrace_match_tile aatrace_match_tile_sadasd
+*/
+
 typedef unsigned char pix_t;
 
 void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
@@ -25,7 +30,5 @@ void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
 void aatrace_match_pic(char* txtbuf, const pix_t* p, const pix_t* f,
 		       int w, int h, int fw, int fh, int ch);
 
-void aatrace_render_tile(pix_t* t, const pix_t* f, int tl,
-			 int w, int fw, int ch);
 void aatrace_render_pic(pix_t* p, const char* txt, const pix_t* f,
 			int w, int tw, int th, int fw, int ch);

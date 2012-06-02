@@ -1,5 +1,6 @@
 #include "aatrace.h"
 
+static
 void aatrace_render_tile(pix_t* t, const pix_t* f, int ft,
 			 int w, int fw, int ch)
 {
