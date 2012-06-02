@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 	pix_t* dbuf;
 	int width, height;
 	unsigned int scale = 0;
+	int kernel = 0;
 
 	if (argc < 3)
 		return 1;
@@ -21,12 +22,16 @@ int main(int argc, char* argv[])
 
 	if (argc > 3)
 		scale = atoi(argv[3]);
-
 	if (!scale)
 		scale = AATRACE_DIFF_SCALE_DEFAULT;
 
+	if (argc > 4)
+		kernel = atoi(argv[4]);
+	if (!kernel)
+		kernel = AATRACE_DIFF_KERNEL_DEFAULT;
+
 	dbuf = (pix_t*)malloc(width*height);
-	aatrace_diff(dbuf, sbuf, width, height, scale);
+	aatrace_diff(dbuf, sbuf, width, height, scale, kernel);
 	util_store_pic(argv[2], dbuf, width, height);
 
 	return 0;

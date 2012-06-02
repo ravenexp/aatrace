@@ -11,7 +11,7 @@ all: testdiff testconv testrender
 testdiff: testdiff.o pnm.o util.o diff.o
 	$(CCLD) -o $@ $^
 
-testconv: testconv.o pnm.o util.o diff.o match.o render.o
+testconv: testconv.o pnm.o util.o match.o
 	$(CCLD) -o $@ $^
 
 testrender: testrender.o pnm.o util.o render.o

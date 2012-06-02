@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "aatrace.h"
 
+static
 void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
 		   unsigned int scale)
 {
@@ -17,6 +18,7 @@ void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
 		}
 }
 
+static
 void aatrace_diff3(pix_t* d, pix_t* s, int w, int h,
 		   unsigned int scale)
 {
@@ -54,6 +56,7 @@ static const int diff4_Ky[4][4] =
 	{ 1,  2,  2,  1}
 };
 
+static
 void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
 		   unsigned int scale)
 {
@@ -77,4 +80,19 @@ void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
 			D = (D*scale)/24;
 			d[i] = (D > 255) ? 255 : D;
 		}
+}
+
+void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
+		  unsigned int scale,
+		  int kernel)
+{
+	switch (kernel) {
+	default:
+	case 2:
+		return aatrace_diff2(d, s, w, h, scale);
+	case 3:
+		return aatrace_diff3(d, s, w, h, scale);
+	case 4:
+		return aatrace_diff4(d, s, w, h, scale);
+	}
 }

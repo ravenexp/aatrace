@@ -10,20 +10,17 @@
 #define AATRACE_DIFF_SCALE_DEFAULT 4
 
 /* Differentiation kernel implementation
-   diff2 - 2x2 flat top
-   diff3 - 3x3 Sobel operator
-   diff4 - 4x4 [1 2 2 1]^2 operator
+   2 - 2x2 flat top
+   3 - 3x3 Sobel operator
+   4 - 4x4 [1 2 2 1]^2 operator
  */
-#define aatrace_diff aatrace_diff3
+#define AATRACE_DIFF_KERNEL_DEFAULT 3
 
 typedef unsigned char pix_t;
 
-void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
-		   unsigned int scale);
-void aatrace_diff3(pix_t* d, pix_t* s, int w, int h,
-		   unsigned int scale);
-void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
-		   unsigned int scale);
+void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
+		  unsigned int scale,
+		  int kernel);
 
 int aatrace_match_tile(const pix_t* t, const pix_t* f,
 		       int w, int fw, int fh, int ch);
