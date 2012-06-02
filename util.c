@@ -16,7 +16,7 @@ char* util_read_text(FILE* f, int* ptwidth, int* ptheight)
 	w = strlen(txt) - 1;
 
 	for (l = 1; ; l++) {
-		if ((l + 1)*w > sz) {
+		if ((l + 1)*w + 1 > sz) {
 			sz *= 2;
 			txt = (char*)realloc(txt, sz);
 		}
