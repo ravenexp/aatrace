@@ -22,8 +22,6 @@ void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
 		  unsigned int scale,
 		  int kernel);
 
-int aatrace_match_tile(const pix_t* t, const pix_t* f,
-		       int w, int fw, int fh, int ch);
 void aatrace_match_pic(char* txtbuf, const pix_t* p, const pix_t* f,
 		       int w, int h, int fw, int fh, int ch);
 

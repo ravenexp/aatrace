@@ -1,8 +1,20 @@
 #include <stdlib.h>
 #include "aatrace.h"
 
+static
+void aatrace_blit_tile(pix_t* d, const pix_t* s,
+		       int fw, int sw, int ch)
+{
+	int l, c;
+
+	for (l = 0; l < ch; l++)
+		for (c = 0; c < fw; c++)
+			d[l*fw + c] = s[l*sw + c];
+}
+
+static
 int aatrace_match_tile(const pix_t* t, const pix_t* f,
-		       int w, int fw, int fh, int ch)
+		       int fw, int fh, int ch)
 {
 	int ft, cl, cc;
 	int minsad = 255*fw*ch;
@@ -13,7 +25,7 @@ int aatrace_match_tile(const pix_t* t, const pix_t* f,
 
 		for (cl = 0; cl < ch; cl++)
 			for (cc = 0; cc < fw; cc++)
-				sad += abs(t[cl*w + cc] - f[(ft*ch + cl)*fw + cc]);
+				sad += abs(t[cl*fw + cc] - f[(ft*ch + cl)*fw + cc]);
 
 		if (sad < minsad) {
 			minsad = sad;
@@ -27,15 +39,21 @@ int aatrace_match_tile(const pix_t* t, const pix_t* f,
 void aatrace_match_pic(char* txt, const pix_t* p, const pix_t* f,
 		       int w, int h, int fw, int fh, int ch)
 {
+	pix_t tilebuf[AATRACE_FONT_HEIGHT][AATRACE_FONT_WIDTH];
+
 	int l, c;
 	int tl, tc;
 	int tw = 0;
 
 	for (l = 0, tl = 0; l < h - ch + 1; l += ch, tl++) {
-		for (c = 0, tc = 0; c < w - fw + 1; c += fw, tc++)
-			txt[tl*tw + tc] = aatrace_match_tile(&p[l*w + c], f,
-							     w, fw, fh, ch)
+		for (c = 0, tc = 0; c < w - fw + 1; c += fw, tc++) {
+			aatrace_blit_tile(&tilebuf[0][0], &p[l*w + c], fw, w, ch);
+
+			txt[tl*tw + tc] = aatrace_match_tile(&tilebuf[0][0], f,
+							     fw, fh, ch)
 				+ AATRACE_FONT_ASCII_OFFSET;
+		}
+
 		tw = tc;
 	}
 }
