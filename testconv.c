@@ -9,8 +9,7 @@ int main(int argc, char* argv[])
 {
 	struct aatrace_pic src;
 	struct aatrace_font font;
-	char* txtbuf;
-	int twidth, theight;
+	struct aatrace_text txt;
 
 	if (argc < 4)
 		return 1;
@@ -21,14 +20,10 @@ int main(int argc, char* argv[])
 	if (util_load_font(&font, argv[2]) < 0)
 		return 3;
 
-	twidth = src.w/AATRACE_FONT_WIDTH;
-	theight = src.h/AATRACE_FONT_HEIGHT;
+	aatrace_match_pic(&txt, &src, &font);
 
-	txtbuf = (char*)malloc(twidth*theight);
-	aatrace_match_pic(txtbuf, &src, &font);
-
-	if (util_store_text(argv[3], txtbuf, twidth, theight) < 0)
-		return 5;
+	if (util_store_text(argv[3], &txt) < 0)
+		return 4;
 
 	return 0;
 }

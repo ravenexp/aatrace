@@ -3,35 +3,35 @@
 #include <string.h>
 #include "aatrace.h"
 #include "pnm.h"
+#include "util.h"
 
-char* util_read_text(FILE* f, int* ptwidth, int* ptheight)
+int util_read_text(struct aatrace_text* txt, FILE* f)
 {
 	size_t sz = 0x1000;
-	char* txt = (char*)malloc(sz);
-	unsigned int w, l;
+	txt->buf = (char*)malloc(sz);
+	unsigned int l;
 
-	if (!fgets(txt, sz, f))
-		return 0;
+	if (!fgets(txt->buf, sz, f))
+		return -1;
 
-	w = strlen(txt) - 1;
+	txt->ll = txt->w = strlen(txt->buf) - 1;
 
 	for (l = 1; ; l++) {
-		if ((l + 1)*w + 1 > sz) {
+		if ((l + 1)*txt->ll + 1 > sz) {
 			sz *= 2;
-			txt = (char*)realloc(txt, sz);
+			txt->buf = (char*)realloc(txt->buf, sz);
 		}
 
-		if (!fgets(&txt[l*w], sz - l*w, f))
+		if (!fgets(&txt->buf[l*txt->ll], sz - l*txt->ll, f))
 			break;
 	}
 
-	*ptwidth = w;
-	*ptheight = l;
+	txt->h = l;
 
-	return txt;
+	return 0;
 }
 
-char* util_load_text(const char* fname, int* ptwidth, int* ptheight)
+int util_load_text(struct aatrace_text* txt, const char* fname)
 {
 	FILE* f = stdin;
 
@@ -41,25 +41,24 @@ char* util_load_text(const char* fname, int* ptwidth, int* ptheight)
 			return 0;
 	}
 
-	return util_read_text(f, ptwidth, ptheight);
+	return util_read_text(txt, f);
 }
 
-int util_write_text(FILE* f, const char* txt, int twidth, int theight)
+int util_write_text(FILE* f, const struct aatrace_text* txt)
 {
 	int l;
 
-	for (l = 0; l < theight; l++) {
-		if (fwrite(&txt[l*twidth], twidth, 1, f) != 1)
+	for (l = 0; l < txt->h; l++) {
+		if (fwrite(&txt->buf[l*txt->ll], txt->w, 1, f) != 1)
 			return -1;
 
 		putc('\n', f);
 	}
 
-	return (twidth + 1)*theight;
+	return (txt->w + 1)*txt->h;
 }
 
-int util_store_text(const char* fname, const char* txt,
-		    int twidth, int theight)
+int util_store_text(const char* fname, const struct aatrace_text* txt)
 {
 	FILE* f = stdout;
 
@@ -69,7 +68,7 @@ int util_store_text(const char* fname, const char* txt,
 			return -1;
 	}
 
-	return util_write_text(f, txt, twidth, theight);
+	return util_write_text(f, txt);
 }
 
 int util_load_pic(struct aatrace_pic* pic, const char* fname)
