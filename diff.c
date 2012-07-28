@@ -1,8 +1,10 @@
 #include <stdlib.h>
+#include <string.h>
 #include "aatrace.h"
 
 static
-void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
+void aatrace_diff2(unsigned char* d, unsigned char* s,
+		   int w, int h,
 		   unsigned int scale)
 {
 	int l, i;
@@ -19,7 +21,8 @@ void aatrace_diff2(pix_t* d, pix_t* s, int w, int h,
 }
 
 static
-void aatrace_diff3(pix_t* d, pix_t* s, int w, int h,
+void aatrace_diff3(unsigned char* d, unsigned char* s,
+		   int w, int h,
 		   unsigned int scale)
 {
 	int l, i;
@@ -57,7 +60,8 @@ static const int diff4_Ky[4][4] =
 };
 
 static
-void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
+void aatrace_diff4(unsigned char* d, unsigned char* s,
+		   int w, int h,
 		   unsigned int scale)
 {
 	int l, i;
@@ -82,17 +86,30 @@ void aatrace_diff4(pix_t* d, pix_t* s, int w, int h,
 		}
 }
 
-void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
-		  unsigned int scale,
-		  int kernel)
+
+void aatrace_diff(struct aatrace_pic* dst,
+		  const struct aatrace_pic* src,
+		  struct aatrace_diff_ctx ctx)
 {
-	switch (kernel) {
+	dst->w = src->w;
+	dst->h = src->h;
+	dst->ll = src->ll;
+
+	dst->buf = (unsigned char*)malloc(dst->ll*dst->h);
+
+	if (!ctx.scale)
+		ctx.scale = AATRACE_DIFF_SCALE_DEFAULT;
+
+	switch (ctx.kernel) {
+	case AATRACE_DIFF_KERNEL_NONE:
+		return (void)memcpy(dst->buf, src->buf, src->ll*src->h);
+	case AATRACE_DIFF_KERNEL_2x2:
+		return aatrace_diff2(dst->buf, src->buf, src->ll, src->h, ctx.scale);
 	default:
-	case 2:
-		return aatrace_diff2(d, s, w, h, scale);
-	case 3:
-		return aatrace_diff3(d, s, w, h, scale);
-	case 4:
-		return aatrace_diff4(d, s, w, h, scale);
+	case AATRACE_DIFF_KERNEL_DEFAULT:
+	case AATRACE_DIFF_KERNEL_3x3:
+		return aatrace_diff3(dst->buf, src->buf, src->ll, src->h, ctx.scale);
+	case AATRACE_DIFF_KERNEL_4x4:
+		return aatrace_diff4(dst->buf, src->buf, src->ll, src->h, ctx.scale);
 	}
 }

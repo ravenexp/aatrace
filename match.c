@@ -2,17 +2,17 @@
 #include "aatrace.h"
 
 static
-void aatrace_blit_tile(pix_t* d, const pix_t* s,
-		       int fw, int sw, int ch)
+void aatrace_blit_tile(unsigned char* d, const unsigned char* s,
+		       int tw, int ll, int ch)
 {
 	int l, c;
 
 	for (l = 0; l < ch; l++)
-		for (c = 0; c < fw; c++)
-			d[l*fw + c] = s[l*sw + c];
+		for (c = 0; c < tw; c++)
+			d[l*tw + c] = s[l*ll + c];
 }
 
-int aatrace_match_tile_sad(const pix_t* t, const pix_t* f,
+int aatrace_match_tile_sad(const unsigned char* tile, const unsigned char* font,
 			   int fw, int fh, int ch)
 {
 	int ft, cl, cc;
@@ -24,7 +24,7 @@ int aatrace_match_tile_sad(const pix_t* t, const pix_t* f,
 
 		for (cl = 0; cl < ch; cl++)
 			for (cc = 0; cc < fw; cc++)
-				sad += abs(t[cl*fw + cc] - f[(ft*ch + cl)*fw + cc]);
+				sad += abs(tile[cl*fw + cc] - font[(ft*ch + cl)*fw + cc]);
 
 		if (sad < minsad) {
 			minsad = sad;
@@ -35,7 +35,8 @@ int aatrace_match_tile_sad(const pix_t* t, const pix_t* f,
 	return best_ft;
 }
 
-int aatrace_match_tile_sadasd(const pix_t* t, const pix_t* f,
+int aatrace_match_tile_sadasd(const unsigned char* tile,
+			      const unsigned char* font,
 			      int fw, int fh, int ch)
 {
 	int ft, cl, cc;
@@ -51,7 +52,7 @@ int aatrace_match_tile_sadasd(const pix_t* t, const pix_t* f,
 			for (cc = 0; cc < fw; cc++) {
 				int d;
 
-				d = t[cl*fw + cc] - f[(ft*ch + cl)*fw + cc];
+				d = tile[cl*fw + cc] - font[(ft*ch + cl)*fw + cc];
 				sd += d;
 				sad += abs(d);
 			}
@@ -67,21 +68,24 @@ int aatrace_match_tile_sadasd(const pix_t* t, const pix_t* f,
 	return best_ft;
 }
 
-void aatrace_match_pic(char* txt, const pix_t* p, const pix_t* f,
-		       int w, int h, int fw, int fh, int ch)
+void aatrace_match_pic(char* txtbuf,
+		       const struct aatrace_pic* src,
+		       const struct aatrace_pic* font,
+		       int char_h)
 {
-	pix_t tilebuf[AATRACE_FONT_HEIGHT][AATRACE_FONT_WIDTH];
+	unsigned char tilebuf[AATRACE_FONT_HEIGHT][AATRACE_FONT_WIDTH];
 
 	int l, c;
 	int tl, tc;
 	int tw = 0;
 
-	for (l = 0, tl = 0; l < h - ch + 1; l += ch, tl++) {
-		for (c = 0, tc = 0; c < w - fw + 1; c += fw, tc++) {
-			aatrace_blit_tile(&tilebuf[0][0], &p[l*w + c], fw, w, ch);
+	for (l = 0, tl = 0; l < src->h - char_h + 1; l += char_h, tl++) {
+		for (c = 0, tc = 0; c < src->w - font->w + 1; c += font->w, tc++) {
+			aatrace_blit_tile(&tilebuf[0][0], &src->buf[l*src->ll + c],
+					  font->w, src->ll, char_h);
 
-			txt[tl*tw + tc] = aatrace_match_tile(&tilebuf[0][0], f,
-							     fw, fh, ch)
+			txtbuf[tl*tw + tc] = aatrace_match_tile(&tilebuf[0][0], font->buf,
+								font->w, font->h, char_h)
 				+ AATRACE_FONT_ASCII_OFFSET;
 		}
 

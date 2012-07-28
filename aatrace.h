@@ -14,21 +14,44 @@
    3 - 3x3 Sobel operator
    4 - 4x4 [1 2 2 1]^2 operator
  */
-#define AATRACE_DIFF_KERNEL_DEFAULT 3
+enum aatrace_diff_kernel {
+	AATRACE_DIFF_KERNEL_DEFAULT,
+	AATRACE_DIFF_KERNEL_NONE,
+	AATRACE_DIFF_KERNEL_2x2,
+	AATRACE_DIFF_KERNEL_3x3,
+	AATRACE_DIFF_KERNEL_4x4
+};
+
+#define AATRACE_DEFAULT_DIFF_KERNEL AATRACE_DIFF_KERNEL_3x3
+
 
 #define aatrace_match_tile aatrace_match_tile_sad
 /*
 #define aatrace_match_tile aatrace_match_tile_sadasd
 */
 
-typedef unsigned char pix_t;
+struct aatrace_pic
+{
+	unsigned char* buf;
+	unsigned int ll;
+	int w, h;
+};
 
-void aatrace_diff(pix_t* d, pix_t* s, int w, int h,
-		  unsigned int scale,
-		  int kernel);
+struct aatrace_diff_ctx
+{
+	unsigned int scale;
+	enum aatrace_diff_kernel kernel;
+};
 
-void aatrace_match_pic(char* txtbuf, const pix_t* p, const pix_t* f,
-		       int w, int h, int fw, int fh, int ch);
+void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
+		  struct aatrace_diff_ctx ctx);
 
-void aatrace_render_pic(pix_t* p, const char* txt, const pix_t* f,
-			int w, int tw, int th, int fw, int ch);
+void aatrace_match_pic(char* txtbuf,
+		       const struct aatrace_pic* src,
+		       const struct aatrace_pic* font,
+		       int char_h);
+
+void aatrace_render_pic(struct aatrace_pic* out,
+			const char* txt,
+			const struct aatrace_pic* font,
+			int tw, int th, int char_h);
