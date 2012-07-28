@@ -70,8 +70,7 @@ int aatrace_match_tile_sadasd(const unsigned char* tile,
 
 void aatrace_match_pic(char* txtbuf,
 		       const struct aatrace_pic* src,
-		       const struct aatrace_pic* font,
-		       int char_h)
+		       const struct aatrace_font* font)
 {
 	unsigned char tilebuf[AATRACE_FONT_HEIGHT][AATRACE_FONT_WIDTH];
 
@@ -79,14 +78,14 @@ void aatrace_match_pic(char* txtbuf,
 	int tl, tc;
 	int tw = 0;
 
-	for (l = 0, tl = 0; l < src->h - char_h + 1; l += char_h, tl++) {
+	for (l = 0, tl = 0; l < src->h - font->h + 1; l += font->h, tl++) {
 		for (c = 0, tc = 0; c < src->w - font->w + 1; c += font->w, tc++) {
 			aatrace_blit_tile(&tilebuf[0][0], &src->buf[l*src->ll + c],
-					  font->w, src->ll, char_h);
+					  font->w, src->ll, font->h);
 
-			txtbuf[tl*tw + tc] = aatrace_match_tile(&tilebuf[0][0], font->buf,
-								font->w, font->h, char_h)
-				+ AATRACE_FONT_ASCII_OFFSET;
+			txtbuf[tl*tw + tc] = aatrace_match_tile(&tilebuf[0][0], font->pic.buf,
+								font->w, font->pic.h, font->h)
+				+ font->ascii_offset;
 		}
 
 		tw = tc;

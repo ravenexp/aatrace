@@ -15,21 +15,21 @@ void aatrace_render_tile(unsigned char* tile, const unsigned char* font,
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const char* txt,
-			const struct aatrace_pic* font,
-			int tw, int th, int char_h)
+			const struct aatrace_font* font,
+			int tw, int th)
 {
 	int tl, tc;
 
 	out->ll = out->w = tw*font->w;
-	out->h = th*char_h;
+	out->h = th*font->h;
 	out->buf = (unsigned char*)malloc(out->ll*out->h);
 
 	for (tl = 0; tl < th; tl++)
 		for (tc = 0; tc < tw; tc++) {
-			int ft = txt[tl*tw + tc] - AATRACE_FONT_ASCII_OFFSET;
+			int ft = txt[tl*tw + tc] - font->ascii_offset;
 
-			aatrace_render_tile(&out->buf[tl*char_h*out->ll + tc*font->w],
-					    font->buf, ft, out->ll, font->w, char_h);
+			aatrace_render_tile(&out->buf[tl*font->h*out->ll + tc*font->w],
+					    font->pic.buf, ft, out->ll, font->w, font->h);
 		}
 }
 

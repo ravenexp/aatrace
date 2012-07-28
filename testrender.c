@@ -7,7 +7,8 @@
 
 int main(int argc, char* argv[])
 {
-	struct aatrace_pic out, font;
+	struct aatrace_pic out;
+	struct aatrace_font font;
 
 	char* txtbuf;
 	int twidth, theight;
@@ -19,17 +20,14 @@ int main(int argc, char* argv[])
 	if (!txtbuf)
 		return 2;
 
-	if (util_load_pic(&font, argv[2]) < 0)
+	if (util_load_font(&font, argv[2]) < 0)
 		return 3;
-	if (font.w != AATRACE_FONT_WIDTH)
-		return 4;
 
 	aatrace_render_pic(&out, txtbuf, &font,
-			   twidth, theight,
-			   AATRACE_FONT_HEIGHT);
+			   twidth, theight);
 
 	if (util_store_pic(argv[3], &out) < 0)
-		return 5;
+		return 4;
 
 	return 0;
 }

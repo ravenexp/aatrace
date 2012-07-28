@@ -117,3 +117,18 @@ int util_store_pic(const char* fname, const struct aatrace_pic* pic)
 
 	return written;
 }
+
+int util_load_font(struct aatrace_font* font, const char* fname)
+{
+	if (util_load_pic(&font->pic, fname) < 0)
+		return -1;
+
+	if (font->pic.w != AATRACE_FONT_WIDTH)
+		return -1;
+
+	font->w = AATRACE_FONT_WIDTH;
+	font->h = AATRACE_FONT_HEIGHT;
+	font->ascii_offset = AATRACE_FONT_ASCII_OFFSET;
+
+	return 0;
+}

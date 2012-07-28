@@ -37,6 +37,13 @@ struct aatrace_pic
 	int w, h;
 };
 
+struct aatrace_font
+{
+	struct aatrace_pic pic;
+	int w, h;
+	int ascii_offset;
+};
+
 struct aatrace_diff_ctx
 {
 	unsigned int scale;
@@ -48,10 +55,9 @@ void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
 
 void aatrace_match_pic(char* txtbuf,
 		       const struct aatrace_pic* src,
-		       const struct aatrace_pic* font,
-		       int char_h);
+		       const struct aatrace_font* font);
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const char* txt,
-			const struct aatrace_pic* font,
-			int tw, int th, int char_h);
+			const struct aatrace_font* font,
+			int tw, int th);
