@@ -1,16 +1,6 @@
 #include <stdlib.h>
 #include "aatrace.h"
-
-static
-void aatrace_blit_tile(unsigned char* d, const unsigned char* s,
-		       int tw, int ll, int ch)
-{
-	int l, c;
-
-	for (l = 0; l < ch; l++)
-		for (c = 0; c < tw; c++)
-			d[l*tw + c] = s[l*ll + c];
-}
+#include "bitblt.h"
 
 int aatrace_match_tile_sad(const unsigned char* tile, const unsigned char* font,
 			   int fw, int fh, int ch)
@@ -74,17 +64,18 @@ void aatrace_match_pic(struct aatrace_text* txt,
 {
 	unsigned char tilebuf[AATRACE_FONT_HEIGHT][AATRACE_FONT_WIDTH];
 
-	int l, c;
 	int tl, tc;
 
 	txt->ll = txt->w = src->w/AATRACE_FONT_WIDTH;
 	txt->h = src->h/AATRACE_FONT_HEIGHT;
 	txt->buf = (char*)malloc(txt->ll*txt->h);
 
-	for (l = 0, tl = 0; l < src->h - font->h + 1; l += font->h, tl++) {
-		for (c = 0, tc = 0; c < src->w - font->w + 1; c += font->w, tc++) {
-			aatrace_blit_tile(&tilebuf[0][0], &src->buf[l*src->ll + c],
-					  font->w, src->ll, font->h);
+	for (tl = 0; (tl + 1)*font->h <= src->h; tl++) {
+		for (tc = 0; (tc + 1)*font->w <= src->w; tc++) {
+			aatrace_bitblt(&tilebuf[0][0], src->buf,
+				       font->w, src->ll,
+				       0, 0, tc*font->w, tl*font->h,
+				       font->w, font->h);
 
 			txt->buf[tl*txt->ll + tc] = aatrace_match_tile(&tilebuf[0][0], font->pic.buf,
 								       font->w, font->pic.h, font->h)

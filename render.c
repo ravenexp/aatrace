@@ -1,17 +1,6 @@
 #include <stdlib.h>
 #include "aatrace.h"
-
-static
-void aatrace_render_tile(unsigned char* tile, const unsigned char* font,
-			 int ft, int w, int fw, int ch)
-{
-	int cl, cc;
-
-	for (cl = 0; cl < ch; cl++)
-		for (cc = 0; cc < fw; cc++)
-			tile[cl*w + cc] = font[(ft*ch + cl)*fw + cc];
-}
-
+#include "bitblt.h"
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const struct aatrace_text* txt,
@@ -25,10 +14,13 @@ void aatrace_render_pic(struct aatrace_pic* out,
 
 	for (tl = 0; tl < txt->h; tl++)
 		for (tc = 0; tc < txt->w; tc++) {
-			int ft = txt->buf[tl*txt->ll + tc] - font->ascii_offset;
+			int tile = txt->buf[tl*txt->ll + tc] - font->ascii_offset;
 
-			aatrace_render_tile(&out->buf[tl*font->h*out->ll + tc*font->w],
-					    font->pic.buf, ft, out->ll, font->w, font->h);
+			aatrace_bitblt(out->buf, font->pic.buf,
+				       out->ll, font->pic.ll,
+				       tc*font->w, tl*font->h,
+				       0, tile*font->h,
+				       font->w, font->h);
 		}
 }
 
