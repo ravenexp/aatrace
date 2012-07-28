@@ -127,6 +127,7 @@ int util_load_font(struct aatrace_font* font, const char* fname)
 
 	font->w = AATRACE_FONT_WIDTH;
 	font->h = AATRACE_FONT_HEIGHT;
+	font->nchars = font->pic.h/AATRACE_FONT_HEIGHT;
 	font->ascii_offset = AATRACE_FONT_ASCII_OFFSET;
 
 	return 0;

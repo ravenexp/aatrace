@@ -9,11 +9,7 @@
 */
 #define AATRACE_DIFF_SCALE_DEFAULT 4
 
-/* Differentiation kernel implementation
-   2 - 2x2 flat top
-   3 - 3x3 Sobel operator
-   4 - 4x4 [1 2 2 1]^2 operator
- */
+/* Differentiation kernel implementation */
 enum aatrace_diff_kernel {
 	AATRACE_DIFF_KERNEL_DEFAULT,
 	AATRACE_DIFF_KERNEL_NONE,
@@ -24,11 +20,17 @@ enum aatrace_diff_kernel {
 
 #define AATRACE_DEFAULT_DIFF_KERNEL AATRACE_DIFF_KERNEL_3x3
 
+/* Image tile to font characters matching method */
+enum aatrace_match_method {
+	AATRACE_MATCH_METHOD_DEFAULT,
+	AATRACE_MATCH_METHOD_MINSAD,
+	AATRACE_MATCH_METHOD_MINSADASD
+};
 
-#define aatrace_match_tile aatrace_match_tile_sad
-/*
-#define aatrace_match_tile aatrace_match_tile_sadasd
-*/
+#define AATRACE_DEFAULT_MATCH_METHOD AATRACE_MATCH_MINSAD
+
+#define AATRACE_DEFAULT_SAD_WEIGHT 2
+#define AATRACE_DEFAULT_ASD_WEIGHT 1
 
 struct aatrace_pic
 {
@@ -41,6 +43,7 @@ struct aatrace_font
 {
 	struct aatrace_pic pic;
 	int w, h;
+	int nchars;
 	int ascii_offset;
 };
 
@@ -53,8 +56,14 @@ struct aatrace_text
 
 struct aatrace_diff_ctx
 {
-	unsigned int scale;
 	enum aatrace_diff_kernel kernel;
+	unsigned int scale;
+};
+
+struct aatrace_match_ctx
+{
+	enum aatrace_match_method method;
+	unsigned int sad_weight, asd_weight;
 };
 
 void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
@@ -62,7 +71,8 @@ void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
 
 void aatrace_match_pic(struct aatrace_text* txt,
 		       const struct aatrace_pic* src,
-		       const struct aatrace_font* font);
+		       const struct aatrace_font* font,
+		       struct aatrace_match_ctx ctx);
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const struct aatrace_text* txt,
