@@ -53,7 +53,7 @@ $ ./testdiff image.pgm image.diff.pgm [diffscale] [diffkernel]
 
 Generate ASCII text file from the differentiated image:
 
-$ ./testconv image.diff.pgm font/font8x16.pgm image.txt
+$ ./testconv image.diff.pgm font/font8x16.pgm image.txt [matchmethod] [sadweight] [asdweight]
 
 Render ASCII text back into image:
 
@@ -84,3 +84,20 @@ Heavily oversampled images require larger kernels (4),
 while vector drawing and pixel art details are better preserved by
 smaller kernels (2). 3 is a reasonable default.
 
+Changing matchmethod affects the conversion strategy:
+  * SAD (1) looks for the most similar character representation.
+  * SAD+ASD (2) tries to optimize for the overall perceptible similarity
+                at the expense of larger small-scale errors.
+
+Tweaking sadweight/asdweight ratio tunes SAD+ASD method
+to pay more attention to shape (sadweight) or overall brightness (asdweight).
+Due to the nature of the minimization problem, only the ratio of the weights is
+significant, i.e. the default 5:2 is the same as 10:4.
+
+Example:
+
+$ ./aaconvert.sh test.pgm 1 1 2 1 10
+
+Yields the result very similar to what aalib does.
+It skips the differentiation (codes levels rather than edges) and
+gives ASD 10 times more weight than SAD.
