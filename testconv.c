@@ -25,7 +25,12 @@ int main(int argc, char* argv[])
 	ctx.method = AATRACE_MATCH_METHOD_DEFAULT;
 	if (argc > 4)
 		ctx.method = (enum aatrace_match_method)atoi(argv[4]);
+
 	ctx.sad_weight = ctx.asd_weight = 0;
+	if (argc > 5)
+		ctx.sad_weight = atoi(argv[5]);
+	if (argc > 6)
+		ctx.asd_weight = atoi(argv[6]);
 
 	aatrace_match_pic(&txt, &src, &font, ctx);
 

@@ -6,10 +6,12 @@ FONT=${AAFONT:-${P}/font/font8x16.pgm}
 SCALE="$2"
 KERNEL="$3"
 METHOD="$4"
+SADWEIGHT="$5"
+ASDWEIGHT="$6"
 
 [[ -f $S ]] || {
     echo "Usage:"
-    echo "    aaconvert image.pgm [diffscale] [diffkernel] [matchmethod]"
+    echo "    aaconvert image.pgm [diffscale] [diffkernel] [matchmethod] [sadweight] [asdweight]"
     exit
 } >&2
 
@@ -34,6 +36,6 @@ echo "DIFF:   $S -> $D"
 ${P}/testdiff "$S" "$D" $SCALE $KERNEL || die
 echo "FONT:   $FONT"
 echo "CONV:   $D -> $T"
-${P}/testconv "$D" "$FONT" "$T" $METHOD || die
+${P}/testconv "$D" "$FONT" "$T" $METHOD $SADWEIGHT $ASDWEIGHT || die
 echo "RENDER: $T -> $O"
 ${P}/testrender "$T" "$FONT" "$O" || die
