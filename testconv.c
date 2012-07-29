@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	struct aatrace_font font;
 	struct aatrace_text txt;
 
-	struct aatrace_match_ctx ctx;
+	struct aatrace_convert_ctx ctx;
 
 	if (argc < 4)
 		return 1;
@@ -22,17 +22,17 @@ int main(int argc, char* argv[])
 	if (util_load_font(&font, argv[2]) < 0)
 		return 3;
 
-	ctx.method = AATRACE_MATCH_METHOD_DEFAULT;
+	ctx.match.method = AATRACE_MATCH_METHOD_DEFAULT;
 	if (argc > 4)
-		ctx.method = (enum aatrace_match_method)atoi(argv[4]);
+		ctx.match.method = (enum aatrace_match_method)atoi(argv[4]);
 
-	ctx.sad_weight = ctx.asd_weight = 0;
+	ctx.match.sad_weight = ctx.match.asd_weight = 0;
 	if (argc > 5)
-		ctx.sad_weight = atoi(argv[5]);
+		ctx.match.sad_weight = atoi(argv[5]);
 	if (argc > 6)
-		ctx.asd_weight = atoi(argv[6]);
+		ctx.match.asd_weight = atoi(argv[6]);
 
-	aatrace_match_pic(&txt, &src, &font, ctx);
+	aatrace_convert_pic(&txt, &src, &font, ctx);
 
 	if (util_store_text(argv[3], &txt) < 0)
 		return 4;

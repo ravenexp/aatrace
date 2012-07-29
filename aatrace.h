@@ -32,6 +32,15 @@ enum aatrace_match_method {
 #define AATRACE_DEFAULT_SAD_WEIGHT 5
 #define AATRACE_DEFAULT_ASD_WEIGHT 2
 
+enum aatrace_search_method {
+	AATRACE_SEARCH_METHOD_DEFAULT,
+	AATRACE_SEARCH_METHOD_NONE,
+	AATRACE_SEARCH_METHOD_DIAMOND,
+	AATRACE_SEARCH_METHOD_BOX
+};
+
+#define AATRACE_DEFAULT_SEARCH_METHOD AATRACE_SEARCH_METHOD_NONE
+
 struct aatrace_pic
 {
 	unsigned char* buf;
@@ -66,13 +75,25 @@ struct aatrace_match_ctx
 	unsigned int sad_weight, asd_weight;
 };
 
+struct aatrace_search_ctx
+{
+	enum aatrace_search_method method;
+	unsigned int range;
+};
+
+struct aatrace_convert_ctx
+{
+	struct aatrace_match_ctx match;
+	struct aatrace_search_ctx search;
+};
+
 void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
 		  struct aatrace_diff_ctx ctx);
 
-void aatrace_match_pic(struct aatrace_text* txt,
-		       const struct aatrace_pic* src,
-		       const struct aatrace_font* font,
-		       struct aatrace_match_ctx ctx);
+void aatrace_convert_pic(struct aatrace_text* txt,
+			 const struct aatrace_pic* src,
+			 const struct aatrace_font* font,
+			 struct aatrace_convert_ctx ctx);
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const struct aatrace_text* txt,
