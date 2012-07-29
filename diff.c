@@ -100,13 +100,15 @@ void aatrace_diff(struct aatrace_pic* dst,
 	if (!ctx.scale)
 		ctx.scale = AATRACE_DIFF_SCALE_DEFAULT;
 
+	if (ctx.kernel == AATRACE_DIFF_KERNEL_DEFAULT)
+		ctx.kernel = AATRACE_DEFAULT_DIFF_KERNEL;
+
 	switch (ctx.kernel) {
+	default:
 	case AATRACE_DIFF_KERNEL_NONE:
 		return (void)memcpy(dst->buf, src->buf, src->ll*src->h);
 	case AATRACE_DIFF_KERNEL_2x2:
 		return aatrace_diff2(dst->buf, src->buf, src->ll, src->h, ctx.scale);
-	default:
-	case AATRACE_DIFF_KERNEL_DEFAULT:
 	case AATRACE_DIFF_KERNEL_3x3:
 		return aatrace_diff3(dst->buf, src->buf, src->ll, src->h, ctx.scale);
 	case AATRACE_DIFF_KERNEL_4x4:

@@ -100,9 +100,16 @@ aatrace_match_tile(const unsigned char* tilebuf,
 		   int nchars,
 		   struct aatrace_match_ctx ctx)
 {
+	if (!ctx.sad_weight)
+		ctx.sad_weight = AATRACE_DEFAULT_SAD_WEIGHT;
+	if (!ctx.asd_weight)
+		ctx.asd_weight = AATRACE_DEFAULT_ASD_WEIGHT;
+
+	if (ctx.method == AATRACE_MATCH_METHOD_DEFAULT)
+		ctx.method = AATRACE_DEFAULT_MATCH_METHOD;
+
 	switch (ctx.method) {
 	default:
-	case AATRACE_MATCH_METHOD_DEFAULT:
 	case AATRACE_MATCH_METHOD_MINSAD:
 		return aatrace_match_tile_sad(tilebuf, fontbuf, nchars, ctx);
 	case AATRACE_MATCH_METHOD_MINSADASD:
@@ -122,11 +129,6 @@ void aatrace_match_pic(struct aatrace_text* txt,
 	txt->ll = txt->w = src->w/AATRACE_FONT_WIDTH;
 	txt->h = src->h/AATRACE_FONT_HEIGHT;
 	txt->buf = (char*)malloc(txt->ll*txt->h);
-
-	if (!ctx.sad_weight)
-		ctx.sad_weight = AATRACE_DEFAULT_SAD_WEIGHT;
-	if (!ctx.asd_weight)
-		ctx.asd_weight = AATRACE_DEFAULT_ASD_WEIGHT;
 
 	for (tl = 0; (tl + 1)*font->h <= src->h; tl++) {
 		for (tc = 0; (tc + 1)*font->w <= src->w; tc++) {
