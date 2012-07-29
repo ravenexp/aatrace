@@ -11,7 +11,7 @@ while (!works)
 
 Using convenience wrapper script:
 
-$ ./aaconvert.sh image.pgm [diffscale] [diffkernel]
+$ ./aaconvert.sh image.pgm [diffscale] [diffkernel] [matchmethod] [sadweight] [asdweight]
 
 Generates image.diff.pgm, image.txt and image.txt.pgm files
 in the current directory.
@@ -25,6 +25,23 @@ The current default is 4.
 diffkernel (differentiation kernel size) adjust the detail/noise
 sensitivity. Available kernel sizes: 2, 3, 4.
 The default is 3 (Sobel operator).
+Specifying 0 selects the default.
+Specifying 1 skips the differentiation step entirely (aalib-style).
+
+matchmethod selects the character matching algorithm used.
+Available options:
+ 1 - Minimize SAD (sum of absolute differences)
+ 2 - Minimize weighted SAD + ASD (absolute sum of differences)
+The current default is 2.
+Notes:
+ * MIN(SAD) is the tried and proven method used in video motion compensation.
+ * MIN(SAD + ASD) tries to preserve perceptible tile brightness
+   as well as its shape.
+
+sadweight/asdweight parameters tune the SAD+ASD algorithm.
+The matching algorithm looks for MIN(sadweight*SAD + asdweight*ASD).
+The default values are sadweight = 5 and asdweight = 2.
+Specify an integer, non-zero value. Specifying 0 selects the current default.
 
 AAFONT environment variable overrides the default the font image.
 
