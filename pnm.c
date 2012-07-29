@@ -52,7 +52,10 @@ pnm_file pnm_file_open(FILE* f, pnm_type_t* ptype, int* pwidth, int* pheight)
 	if (fscanf(f, "%d %d\n", pwidth, pheight) != 2)
 		return 0;
 
-	if (fscanf(f, "%d\n", &depth) != 1)
+	/* scanf("%d\n") matches ANY AMOUNT of whitespace after the number. */
+	if (fscanf(f, "%d", &depth) != 1)
+		return 0;
+	if (fgetc(f) != '\n')
 		return 0;
 
 	if (depth != 255)
@@ -84,7 +87,7 @@ int pnm_file_read_pic(pnm_file s, pnm_pix_t* picbuf)
 		if (pnm_file_read_line(s, picbuf + l*s->stride) < 0)
 			return -1;
 
-	return s->stride*s->height;
+	return 0;
 }
 
 pnm_file pnm_filename_create(const char* fname, pnm_type_t type, int width, int height)
@@ -138,7 +141,7 @@ int pnm_file_write_pic(pnm_file s, const pnm_pix_t* picbuf)
 		if (pnm_file_write_line(s, picbuf + l*s->stride) < 0)
 			return -1;
 
-	return s->stride*s->height;
+	return 0;
 }
 
 int pnm_file_release(pnm_file s)

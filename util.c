@@ -38,7 +38,7 @@ int util_load_text(struct aatrace_text* txt, const char* fname)
 	if (strcmp(fname, "-")) {
 		f = fopen(fname, "rb");
 		if (!f)
-			return 0;
+			return -1;
 	}
 
 	return util_read_text(txt, f);
@@ -99,7 +99,6 @@ int util_load_pic(struct aatrace_pic* pic, const char* fname)
 int util_store_pic(const char* fname, const struct aatrace_pic* pic)
 {
 	pnm_file pnm;
-	int written;
 
 	if (strcmp(fname, "-")) {
 		pnm = pnm_filename_create(fname, PNM_TYPE_PGM, pic->w, pic->h);
@@ -110,11 +109,12 @@ int util_store_pic(const char* fname, const struct aatrace_pic* pic)
 	if (!pnm)
 		return -1;
 
-	written = pnm_file_write_pic(pnm, pic->buf);
+	if (pnm_file_write_pic(pnm, pic->buf) < 0)
+		return -1;
 
 	pnm_file_close(pnm);
 
-	return written;
+	return 0;
 }
 
 int util_load_font(struct aatrace_font* font, const char* fname)
