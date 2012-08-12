@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "aatrace.h"
 #include "match.h"
+#include "search.h"
 #include "bitblt.h"
 
 /* Assumes FW == font->w, FH == font->h */
@@ -51,6 +52,10 @@ int aatrace_search_tile_diamondbox(const struct aatrace_pic* src,
 
 			r = aatrace_match_tile(&tilebuf[0][0], font->pic.buf,
 					       font->nchars, ctx.match);
+
+			if (ctx.search.flags & AATRACE_SEARCH_FLAG_COVERAGE) {
+				r.score += aatrace_cover_tile_score(src, font, tl, tc, dx, dy, ctx.match);
+			}
 
 			if (r.score < best_r.score)
 				best_r = r;

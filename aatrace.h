@@ -41,6 +41,8 @@ enum aatrace_search_method {
 
 #define AATRACE_DEFAULT_SEARCH_METHOD AATRACE_SEARCH_METHOD_NONE
 
+#define AATRACE_SEARCH_FLAG_COVERAGE 1
+
 struct aatrace_pic
 {
 	unsigned char* buf;
@@ -78,6 +80,7 @@ struct aatrace_match_ctx
 struct aatrace_search_ctx
 {
 	enum aatrace_search_method method;
+	unsigned int flags;
 	unsigned int range;
 };
 

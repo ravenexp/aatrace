@@ -30,11 +30,15 @@ int main(int argc, char* argv[])
 	if (argc > 5)
 		ctx.search.method = (enum aatrace_search_method)atoi(argv[5]);
 
-	ctx.match.sad_weight = ctx.match.asd_weight = 0;
+	ctx.search.flags = 0;
 	if (argc > 6)
-		ctx.match.sad_weight = atoi(argv[6]);
+		ctx.search.flags = atoi(argv[6]);
+
+	ctx.match.sad_weight = ctx.match.asd_weight = 0;
 	if (argc > 7)
-		ctx.match.asd_weight = atoi(argv[7]);
+		ctx.match.sad_weight = atoi(argv[7]);
+	if (argc > 8)
+		ctx.match.asd_weight = atoi(argv[8]);
 
 	aatrace_convert_pic(&txt, &src, &font, ctx);
 
