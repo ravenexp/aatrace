@@ -6,15 +6,12 @@ static
 struct match_result
 aatrace_match_tile_sad(const unsigned char* tilebuf,
 		       const unsigned char* fontbuf,
-		       int nchars,
-		       struct aatrace_match_ctx ctx)
+		       int nchars)
 {
 	struct match_result r;
-	ctx.sad_weight = ctx.asd_weight = 0;
 
 	unsigned int minsad = 255*FW*FH;
 	int best_ch = 0;
-
 	int ch;
 
 	for (ch = 0; ch < nchars; ch++) {
@@ -42,11 +39,12 @@ struct match_result
 aatrace_match_tile_sadasd(const unsigned char* tilebuf,
 			  const unsigned char* fontbuf,
 			  int nchars,
-			  struct aatrace_match_ctx ctx)
+			  unsigned int sad_weight,
+			  unsigned int asd_weight)
 {
 	struct match_result r;
 
-	unsigned int minsadasd = (ctx.sad_weight + ctx.asd_weight)*255*FW*FH;
+	unsigned int minsadasd = (sad_weight + asd_weight)*255*FW*FH;
 	int best_ch = 0;
 
 	int ch;
@@ -69,7 +67,7 @@ aatrace_match_tile_sadasd(const unsigned char* tilebuf,
 		}
 
 		asd = abs(sd);
-		sadasd = sad*ctx.sad_weight + asd*ctx.asd_weight;
+		sadasd = sad*sad_weight + asd*asd_weight;
 		if (sadasd < minsadasd) {
 			minsadasd = sadasd;
 			best_ch = ch;
@@ -81,25 +79,25 @@ aatrace_match_tile_sadasd(const unsigned char* tilebuf,
 	return r;
 }
 
+void aatrace_match_ctx_init(struct aatrace_match_ctx* ctx)
+{
+	ctx->sad_weight = AATRACE_DEFAULT_SAD_WEIGHT;
+	ctx->asd_weight = AATRACE_DEFAULT_ASD_WEIGHT;
+	ctx->method = AATRACE_DEFAULT_MATCH_METHOD;
+}
+
 struct match_result
 aatrace_match_tile(const unsigned char* tilebuf,
 		   const unsigned char* fontbuf,
 		   int nchars,
-		   struct aatrace_match_ctx ctx)
+		   const struct aatrace_match_ctx* ctx)
 {
-	if (!ctx.sad_weight)
-		ctx.sad_weight = AATRACE_DEFAULT_SAD_WEIGHT;
-	if (!ctx.asd_weight)
-		ctx.asd_weight = AATRACE_DEFAULT_ASD_WEIGHT;
-
-	if (ctx.method == AATRACE_MATCH_METHOD_DEFAULT)
-		ctx.method = AATRACE_DEFAULT_MATCH_METHOD;
-
-	switch (ctx.method) {
+	switch (ctx->method) {
 	default:
 	case AATRACE_MATCH_METHOD_MINSAD:
-		return aatrace_match_tile_sad(tilebuf, fontbuf, nchars, ctx);
+		return aatrace_match_tile_sad(tilebuf, fontbuf, nchars);
 	case AATRACE_MATCH_METHOD_MINSADASD:
-		return aatrace_match_tile_sadasd(tilebuf, fontbuf, nchars, ctx);
+		return aatrace_match_tile_sadasd(tilebuf, fontbuf, nchars,
+						 ctx->sad_weight, ctx->asd_weight);
 	}
 }

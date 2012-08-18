@@ -9,7 +9,7 @@ static
 int aatrace_search_tile_none(const struct aatrace_pic* src,
 			     const struct aatrace_font* font,
 			     int tl, int tc,
-			     struct aatrace_convert_ctx ctx)
+			     const struct aatrace_match_ctx* m_ctx)
 {
 	unsigned char tilebuf[FH][FW];
 	struct match_result r;
@@ -20,7 +20,7 @@ int aatrace_search_tile_none(const struct aatrace_pic* src,
 		       FW, FH);
 
 	r = aatrace_match_tile(&tilebuf[0][0], font->pic.buf,
-			       font->nchars, ctx.match);
+			       font->nchars, m_ctx);
 
 	return r.ch;
 }
@@ -29,7 +29,9 @@ static
 int aatrace_search_tile_diamondbox(const struct aatrace_pic* src,
 				   const struct aatrace_font* font,
 				   int tl, int tc,
-				   struct aatrace_convert_ctx ctx)
+				   const struct aatrace_match_ctx* m_ctx,
+				   enum aatrace_search_method method,
+				   unsigned int flags)
 {
 	unsigned char tilebuf[FH][FW];
 	struct match_result r, best_r = {0, -1};
@@ -41,7 +43,7 @@ int aatrace_search_tile_diamondbox(const struct aatrace_pic* src,
 				continue;
 			if (tl*FH + dy < 0 || (tl + 1)*FH + dy > src->h)
 				continue;
-			if (ctx.search.method == AATRACE_SEARCH_METHOD_DIAMOND &&
+			if (method == AATRACE_SEARCH_METHOD_DIAMOND &&
 			    dx*dy != 0)
 				continue;
 
@@ -51,10 +53,10 @@ int aatrace_search_tile_diamondbox(const struct aatrace_pic* src,
 				       FW, FH);
 
 			r = aatrace_match_tile(&tilebuf[0][0], font->pic.buf,
-					       font->nchars, ctx.match);
+					       font->nchars, m_ctx);
 
-			if (ctx.search.flags & AATRACE_SEARCH_FLAG_COVERAGE) {
-				r.score += aatrace_cover_tile_score(src, font, tl, tc, dx, dy, ctx.match);
+			if (flags & AATRACE_SEARCH_FLAG_COVERAGE) {
+				r.score += aatrace_cover_tile_score(src, font, tl, tc, dx, dy, m_ctx);
 			}
 
 			if (r.score < best_r.score)
@@ -64,20 +66,27 @@ int aatrace_search_tile_diamondbox(const struct aatrace_pic* src,
 	return best_r.ch;
 }
 
+void aatrace_search_ctx_init(struct aatrace_search_ctx* ctx)
+{
+	ctx->method = AATRACE_DEFAULT_SEARCH_METHOD;
+	ctx->flags = AATRACE_DEFAULT_SEARCH_FLAGS;
+	ctx->range = 0;
+}
+
 int aatrace_search_tile(const struct aatrace_pic* src,
 			const struct aatrace_font* font,
 			int tl, int tc,
-			struct aatrace_convert_ctx ctx)
+			const struct aatrace_match_ctx* m_ctx,
+			const struct aatrace_search_ctx* ctx)
 {
-	if (ctx.search.method == AATRACE_SEARCH_METHOD_DEFAULT)
-		ctx.search.method = AATRACE_DEFAULT_SEARCH_METHOD;
 
-	switch (ctx.search.method) {
+	switch (ctx->method) {
 	default:
 	case AATRACE_SEARCH_METHOD_NONE:
-		return aatrace_search_tile_none(src, font, tl, tc, ctx);
+		return aatrace_search_tile_none(src, font, tl, tc, m_ctx);
 	case AATRACE_SEARCH_METHOD_DIAMOND:
 	case AATRACE_SEARCH_METHOD_BOX:
-		return aatrace_search_tile_diamondbox(src, font, tl, tc, ctx);
+		return aatrace_search_tile_diamondbox(src, font, tl, tc, m_ctx,
+						      ctx->method, ctx->flags);
 	}
 }

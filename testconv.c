@@ -13,6 +13,8 @@ int main(int argc, char* argv[])
 
 	struct aatrace_convert_ctx ctx;
 
+	aatrace_convert_ctx_init(&ctx);
+
 	if (argc < 4)
 		return 1;
 
@@ -22,25 +24,21 @@ int main(int argc, char* argv[])
 	if (util_load_font(&font, argv[2]) < 0)
 		return 3;
 
-	ctx.match.method = AATRACE_MATCH_METHOD_DEFAULT;
 	if (argc > 4)
 		ctx.match.method = (enum aatrace_match_method)atoi(argv[4]);
 
-	ctx.search.method = AATRACE_SEARCH_METHOD_DEFAULT;
 	if (argc > 5)
 		ctx.search.method = (enum aatrace_search_method)atoi(argv[5]);
 
-	ctx.search.flags = 0;
 	if (argc > 6)
 		ctx.search.flags = atoi(argv[6]);
 
-	ctx.match.sad_weight = ctx.match.asd_weight = 0;
 	if (argc > 7)
 		ctx.match.sad_weight = atoi(argv[7]);
 	if (argc > 8)
 		ctx.match.asd_weight = atoi(argv[8]);
 
-	aatrace_convert_pic(&txt, &src, &font, ctx);
+	aatrace_convert_pic(&txt, &src, &font, &ctx);
 
 	if (util_store_text(argv[3], &txt) < 0)
 		return 4;

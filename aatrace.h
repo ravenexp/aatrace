@@ -43,6 +43,8 @@ enum aatrace_search_method {
 
 #define AATRACE_SEARCH_FLAG_COVERAGE 1
 
+#define AATRACE_DEFAULT_SEARCH_FLAGS 0
+
 struct aatrace_pic
 {
 	unsigned char* buf;
@@ -90,13 +92,18 @@ struct aatrace_convert_ctx
 	struct aatrace_search_ctx search;
 };
 
-void aatrace_diff(struct aatrace_pic* dst, const struct aatrace_pic* src,
-		  struct aatrace_diff_ctx ctx);
+void aatrace_diff_ctx_init(struct aatrace_diff_ctx* ctx);
+
+void aatrace_diff(struct aatrace_pic* dst,
+		  const struct aatrace_pic* src,
+		  const struct aatrace_diff_ctx* ctx);
+
+void aatrace_convert_ctx_init(struct aatrace_convert_ctx* ctx);
 
 void aatrace_convert_pic(struct aatrace_text* txt,
 			 const struct aatrace_pic* src,
 			 const struct aatrace_font* font,
-			 struct aatrace_convert_ctx ctx);
+			 const struct aatrace_convert_ctx* ctx);
 
 void aatrace_render_pic(struct aatrace_pic* out,
 			const struct aatrace_text* txt,

@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include "aatrace.h"
 #include "match.h"
+#include "search.h"
 
 static
 unsigned int edge_score(const unsigned char* p, int l,
 			unsigned int stride,
-			struct aatrace_match_ctx ctx)
+			const struct aatrace_match_ctx* ctx)
 {
 	unsigned int score = 0;
 	int i;
@@ -14,8 +15,8 @@ unsigned int edge_score(const unsigned char* p, int l,
 		score += p[i*stride];
 	}
 
-	if (ctx.method == AATRACE_MATCH_METHOD_MINSADASD)
-		score *= (ctx.sad_weight + ctx.asd_weight);
+	if (ctx->method == AATRACE_MATCH_METHOD_MINSADASD)
+		score *= (ctx->sad_weight + ctx->asd_weight);
 
 	return score;
 }
@@ -25,7 +26,7 @@ unsigned int
 aatrace_cover_tile_score(const struct aatrace_pic* pic,
 			 const struct aatrace_font* font,
 			 int tl, int tc, int dx, int dy,
-			 struct aatrace_match_ctx ctx)
+			 const struct aatrace_match_ctx* ctx)
 {
 	const unsigned char* p =
 		pic->buf + font->h*pic->ll*tl + font->w*tc;

@@ -9,8 +9,10 @@ struct match_result
 	unsigned int score;
 };
 
+void aatrace_match_ctx_init(struct aatrace_match_ctx* ctx);
+
 struct match_result
 aatrace_match_tile(const unsigned char* tilebuf,
 		   const unsigned char* fontbuf,
 		   int nchars,
-		   struct aatrace_match_ctx ctx);
+		   const struct aatrace_match_ctx* ctx);

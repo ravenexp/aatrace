@@ -87,9 +87,15 @@ void aatrace_diff4(unsigned char* d, unsigned char* s,
 }
 
 
+void aatrace_diff_ctx_init(struct aatrace_diff_ctx* ctx)
+{
+	ctx->scale = AATRACE_DIFF_SCALE_DEFAULT;
+	ctx->kernel = AATRACE_DEFAULT_DIFF_KERNEL;
+}
+
 void aatrace_diff(struct aatrace_pic* dst,
 		  const struct aatrace_pic* src,
-		  struct aatrace_diff_ctx ctx)
+		  const struct aatrace_diff_ctx* ctx)
 {
 	dst->w = src->w;
 	dst->h = src->h;
@@ -97,21 +103,19 @@ void aatrace_diff(struct aatrace_pic* dst,
 
 	dst->buf = (unsigned char*)malloc(dst->ll*dst->h);
 
-	if (!ctx.scale)
-		ctx.scale = AATRACE_DIFF_SCALE_DEFAULT;
-
-	if (ctx.kernel == AATRACE_DIFF_KERNEL_DEFAULT)
-		ctx.kernel = AATRACE_DEFAULT_DIFF_KERNEL;
-
-	switch (ctx.kernel) {
+	switch (ctx->kernel) {
 	default:
 	case AATRACE_DIFF_KERNEL_NONE:
-		return (void)memcpy(dst->buf, src->buf, src->ll*src->h);
+		memcpy(dst->buf, src->buf, src->ll*src->h);
+		break;
 	case AATRACE_DIFF_KERNEL_2x2:
-		return aatrace_diff2(dst->buf, src->buf, src->ll, src->h, ctx.scale);
+		aatrace_diff2(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		break;
 	case AATRACE_DIFF_KERNEL_3x3:
-		return aatrace_diff3(dst->buf, src->buf, src->ll, src->h, ctx.scale);
+		aatrace_diff3(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		break;
 	case AATRACE_DIFF_KERNEL_4x4:
-		return aatrace_diff4(dst->buf, src->buf, src->ll, src->h, ctx.scale);
+		aatrace_diff4(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		break;
 	}
 }
