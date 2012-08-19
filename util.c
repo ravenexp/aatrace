@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+
 #include "aatrace.h"
 #include "pnm.h"
 #include "util.h"
@@ -37,11 +39,22 @@ int util_load_text(struct aatrace_text* txt, const char* fname)
 
 	if (strcmp(fname, "-")) {
 		f = fopen(fname, "rb");
-		if (!f)
+		if (!f) {
+			fprintf(stderr, "Error opening TXT file '%s': %s\n",
+				fname, strerror(errno));
+
 			return -1;
+		}
 	}
 
-	return util_read_text(txt, f);
+	if (util_read_text(txt, f) < 0) {
+		fprintf(stderr, "Error reading TXT file '%s': %s\n",
+			fname, strerror(errno));
+
+		return -1;
+	}
+
+	return 0;
 }
 
 int util_write_text(FILE* f, const struct aatrace_text* txt)
@@ -64,11 +77,21 @@ int util_store_text(const char* fname, const struct aatrace_text* txt)
 
 	if (strcmp(fname, "-")) {
 		f = fopen(fname, "wb");
-		if (!f)
+		if (!f) {
+			fprintf(stderr, "Error creating TXT file '%s': %s\n",
+				fname, strerror(errno));
+
 			return -1;
+		}
 	}
 
-	return util_write_text(f, txt);
+	if (util_write_text(f, txt) < 0) {
+		fprintf(stderr, "Error writing TXT file '%s': %s\n",
+			fname, strerror(errno));
+		return -1;
+	}
+
+	return 0;
 }
 
 int util_load_pic(struct aatrace_pic* pic, const char* fname)
@@ -82,14 +105,24 @@ int util_load_pic(struct aatrace_pic* pic, const char* fname)
 		pnm = pnm_file_open(stdin, &type, &pic->w, &pic->h);
 	}
 
-	if (!pnm || type != PNM_TYPE_PGM)
+	if (!pnm || type != PNM_TYPE_PGM) {
+		if (errno) {
+			fprintf(stderr, "Error opening PGM file '%s': %s\n",
+				fname, strerror(errno));
+		} else {
+			fprintf(stderr, "Bad PGM file '%s'\n", fname);
+		}
 		return -1;
+	}
 
 	pic->ll = pic->w;
 	pic->buf = (unsigned char*)malloc(pic->ll*pic->h);
 
-	if (pnm_file_read_pic(pnm, pic->buf) < 0)
+	if (pnm_file_read_pic(pnm, pic->buf) < 0) {
+		fprintf(stderr, "Error reading PGM file '%s': %s\n",
+			fname, strerror(errno));
 		return -1;
+	}
 
 	pnm_file_close(pnm);
 
@@ -106,11 +139,18 @@ int util_store_pic(const char* fname, const struct aatrace_pic* pic)
 		pnm = pnm_file_create(stdout, PNM_TYPE_PGM, pic->w, pic->h);
 	}
 
-	if (!pnm)
+	if (!pnm) {
+		fprintf(stderr, "Error creating PGM file '%s': %s\n",
+			fname, strerror(errno));
 		return -1;
+	}
 
-	if (pnm_file_write_pic(pnm, pic->buf) < 0)
+	if (pnm_file_write_pic(pnm, pic->buf) < 0) {
+		fprintf(stderr, "Error writing PGM file '%s': %s\n",
+			fname, strerror(errno));
+
 		return -1;
+	}
 
 	pnm_file_close(pnm);
 
@@ -122,8 +162,11 @@ int util_load_font(struct aatrace_font* font, const char* fname)
 	if (util_load_pic(&font->pic, fname) < 0)
 		return -1;
 
-	if (font->pic.w != AATRACE_FONT_WIDTH)
+	if (font->pic.w != AATRACE_FONT_WIDTH) {
+		fprintf(stderr, "Font '%s' has unsupported width %d\n",
+			fname, font->pic.w);
 		return -1;
+	}
 
 	font->w = AATRACE_FONT_WIDTH;
 	font->h = AATRACE_FONT_HEIGHT;
