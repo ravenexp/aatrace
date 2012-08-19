@@ -1,42 +1,62 @@
 #!/bin/bash
 
-P=$(dirname "$0")
-S="$1"
-FONT=${AAFONT:-${P}/font/font8x16.pgm}
-SCALE="$2"
-KERNEL="$3"
-MATCHMETHOD="$4"
-SEARCHMETHOD="$5"
-SADWEIGHT="$6"
-ASDWEIGHT="$7"
+DIFFSUFF=""
+CONVSUFF=""
 
-[[ -f $S ]] || {
+DIFFOPTS=""
+CONVOPTS=""
+
+usage() {
     echo "Usage:"
-    echo "    aaconvert image.pgm [diffscale] [diffkernel] [matchmethod] [searchmethod] [sadweight] [asdweight]"
+    echo "    aaconvert.sh [-l <scale>] [-d <kernel>] [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.pgm"
     exit
-} >&2
+}
 
+while getopts "l:d:m:s:c:W:" OPT
+do
+    case $OPT in
+	l|d)
+	    DIFFOPTS="$DIFFOPTS -$OPT $OPTARG"
+	    DIFFSUFF="${DIFFSUFF}${OPT}${OPTARG}."
+	    ;;
+	m|s|c|W)
+	    CONVOPTS="$CONVOPTS -$OPT $OPTARG"
+	    CONVSUFF="${CONVSUFF}${OPT}${OPTARG}."
+	    ;;
+	*)
+	    usage
+	    ;;
+    esac
+done
+
+P=$(dirname "$0")
+
+shift $(($OPTIND - 1))
+
+S="$1"
+[[ -n "$S" ]] || usage
+
+D="${S%.pgm}.diff.${DIFFSUFF}pgm"
+T="${S%.pgm}.ascii.${DIFFSUFF}${CONVSUFF}txt"
+O="${T%.txt}.pgm"
+
+FONT=${AAFONT:-${P}/font/font8x16.pgm}
 [[ -f $FONT ]] || {
-    echo "No font file: '$FONT'"
-    echo "Check AAFONT= env var"
+    echo "Missing font file: '$FONT'"
+    echo "Check AAFONT environment variable"
     exit
 } >&2
-
-BS=$(basename "$S" ".pgm")
-
-D="${BS}.diff.pgm"
-T="${BS}.txt"
-O="${T}.pgm"
 
 die() {
     echo "FAIL! Status: $?"
     exit
 } >&2
 
-echo "DIFF:   $S -> $D"
-${P}/testdiff "$S" "$D" $SCALE $KERNEL || die
-echo "FONT:   $FONT"
-echo "CONV:   $D -> $T"
-${P}/testconv "$D" "$FONT" "$T" $MATCHMETHOD $SEARCHMETHOD $SADWEIGHT $ASDWEIGHT || die
-echo "RENDER: $T -> $O"
+echo "Using font '$FONT'"
+echo "Running DIFF $DIFFOPTS '$S' -> '$D' ..."
+${P}/testdiff $DIFFOPTS "$S" "$D" || die
+echo "Running CONV $CONVOPTS '$D' -> '$T' ..."
+${P}/testconv $CONVOPTS "$D" "$FONT" "$T" || die
+echo "Running RENDER '$T' -> '$O' ..."
 ${P}/testrender "$T" "$FONT" "$O" || die
+echo "Done"
