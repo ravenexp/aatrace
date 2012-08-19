@@ -11,57 +11,105 @@ while (!works)
 
 Using convenience wrapper script:
 
-$ ./aaconvert.sh image.pgm [diffscale] [diffkernel] [matchmethod] [sadweight] [asdweight]
+$ ./aaconvert.sh [-l <scale>] [-d <kernel>] [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.pgm
 
-Generates image.diff.pgm, image.txt and image.txt.pgm files
+Generates image.diff.pgm, image.ascii.txt and image.ascii.pgm files
 in the current directory.
 image.diff.pgm is an intermediate differentiated image output,
-image.txt is the text output and image.txt.pgm is the image output.
+image.ascii.txt is the text output and image.ascii.pgm is the image output.
 
-diffscale is an optional parameter adjusting edge "brightness".
+When one or more command line switches are specified they are embedded in
+the output file names as additional suffixes before the final file type.
+$ ./aaconvert.sh -l 5 image.pgm
+generates image.diff.l5.pgm, image.ascii.l5.txt and image.ascii.l5.pgm.
+
+Available options:
+
+-l <scale> - differentiated image levels scaling
+
+Adjusts differential edge map "brightness".
 Specify small integer in the range of 1..20 (approx).
+1 is "normalized" is the sense that it never clips
+the values (but is too dark for most images).
 The current default is 4.
 
-diffkernel (differentiation kernel size) adjust the detail/noise
-sensitivity. Available kernel sizes: 2, 3, 4.
+-d <kernel> - differentiation kernel (size)
+
+Adjust the detail/noise sensitivity.
+Available kernel sizes: 2, 3, 4.
 The default is 3 (Sobel operator).
-Specifying 0 selects the default.
 Specifying 1 skips the differentiation step entirely (aalib-style).
 
-matchmethod selects the character matching algorithm used.
+-m <id> - match method
+
+Selects the character matching algorithm used.
+
 Available options:
+
  1 - Minimize SAD (sum of absolute differences)
  2 - Minimize weighted SAD + ASD (absolute sum of differences)
+
 The current default is 2.
+
 Notes:
  * MIN(SAD) is the tried and proven method used in video motion compensation.
  * MIN(SAD + ASD) tries to preserve perceptible tile brightness
    as well as its shape.
 
-sadweight/asdweight parameters tune the SAD+ASD algorithm.
-The matching algorithm looks for MIN(sadweight*SAD + asdweight*ASD).
-The default values are sadweight = 5 and asdweight = 2.
-Specify an integer, non-zero value. Specifying 0 selects the current default.
+-s <id> - offset search method
+
+Selects the offset searching algorithm.
+
+Available options:
+
+ 1 - No offset search is performed. The tiles are matched exactly where they
+     are in the source image.
+ 2 - Diamond search. Additionally checks whether better matches can be
+     obtained by offsetting the source image tile by 1 pixel along any axis
+     ("diamond" pattern). Runs match search 5 times.
+ 3 - Box search. The same as diamond + the diagonal moves are checked
+     ("box" pattern). Runs match search 9 times.
+
+The current default is 1 - No search.
+
+-c <1/0> - enable/disable search coverage test
+
+Only affects offset search strategy.
+Performs match score adjustment for off-center matches to improve
+source image feature coverage by the character tiles.
+Can often drastically improve offset search results.
+
+The current default is 0 - disabled.
+
+-W <sad>.<asd> - SAD/ASD weight ratio
+
+<sad> and <asd> parameters tune the SAD+ASD match algorithm.
+Specify two integers separated by dot ('.').
+It's NOT a real number, but rather a ratio of weights <sad>/<asd>.
+Zeros are allowed and meaningful (0 and infinity).
+The matching algorithm looks for MIN(<sad>*SAD + <asd>*ASD).
+
+The default values are <sad> = 5 and <asd> = 2.
 
 AAFONT environment variable overrides the default the font image.
 
 2.1 Using the test utilities (plumbing)
 
-Generate differentiated image:
+Generate the differentiated image:
 
-$ ./testdiff image.pgm image.diff.pgm [diffscale] [diffkernel]
+$ ./testdiff [-l <scale>] [-d <kernel>] image.pgm image.diff.pgm
 
 Generate ASCII text file from the differentiated image:
 
-$ ./testconv image.diff.pgm font/font8x16.pgm image.txt [matchmethod] [sadweight] [asdweight]
+$ ./testconv [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.diff.pgm font/font8x16.pgm image.ascii.txt
 
-Render ASCII text back into image:
+Render ASCII text back into an image:
 
-$ ./testrender image.txt font/font8x16.pgm image.txt.pgm
+$ ./testrender image.ascii.txt font/font8x16.pgm image.ascii.pgm
 
-All arguments are required.
 '-' supplied as an argument uses stdin or stdout for inputs and
 outputs respectively.
+'--' option separator is required to use '-'.
 
 font/font8x16.pgm is the VGA terminal font image supplied as a sample.
 The font bitmap characters are stacked vertically starting from
@@ -75,29 +123,44 @@ convert output(s) into something more usable.
 
 Tweaking command line parameters:
 
-Changing diffscale adjusts the amount of detail (and noise) that makes
+Changing -l <scale> adjusts the amount of detail (and noise) that makes
 it into the final ASCII picture.
 Check generated .diff.pgm file to see the effect of the adjustments.
 
-Changing diffkernel adjusts the detail sensitivity level.
+Changing -d <kernel> adjusts the detail sensitivity level.
 Heavily oversampled images require larger kernels (4),
 while vector drawing and pixel art details are better preserved by
 smaller kernels (2). 3 is a reasonable default.
 
-Changing matchmethod affects the conversion strategy:
+Changing -m <method> affects the match search strategy:
   * SAD (1) looks for the most similar character representation.
   * SAD+ASD (2) tries to optimize for the overall perceptible similarity
                 at the expense of larger small-scale errors.
 
-Tweaking sadweight/asdweight ratio tunes SAD+ASD method
-to pay more attention to shape (sadweight) or overall brightness (asdweight).
+Tweaking -W <sad>.<asd> weights ratio tunes SAD+ASD method
+to pay more attention to shape (SAD) or overall brightness (ASD).
 Due to the nature of the minimization problem, only the ratio of the weights is
-significant, i.e. the default 5:2 is the same as 10:4.
-
+significant, i.e. the default -W 5.2 is the same as -W 10.4.
+-W 1.0 is the same as -m 1, but slower, -W 0.1 is pure ASD (like aalib).
 Example:
-
-$ ./aaconvert.sh test.pgm 1 1 2 1 10
-
+$ ./aaconvert.sh -l1 -d1 -W0.1 test.pgm
 Yields the result very similar to what aalib does.
 It skips the differentiation (codes levels rather than edges) and
-gives ASD 10 times more weight than SAD.
+uses ASD (average level) for the match search.
+
+Enabling offset search via -s 2 or -s 3 allows for better character matches
+at the price of small spatial jitter. This usually results in visually
+"cleaner" image. However, the search algorithm tends to avoid thin lines
+at the edges of the image tiles by stepping away from them. Skipped lines
+are not included in the match search often resulting in smaller match errors.
+Note:
+Diamond search (-s 2) checks 5 possible offsets for each tile,
+resulting in 5x slowdown compared to direct matching.
+Box (-s 3) search analyzes 9 neighboring locations, making it 9x slower.
+
+Enabling coverage test via -c 1 compensates for the edge skipping effect by
+including not matched parts of the source tile in the total match error.
+Stepping away from a feature results in the same match error as matching
+it with black level.
+The coverage test should always be enabled when using offset search for
+the best output quality.
