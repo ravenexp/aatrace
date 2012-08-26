@@ -27,6 +27,9 @@ aatrace_match_tile_sad(const unsigned char* tilebuf,
 			minsad = sad;
 			best_ch = ch;
 		}
+
+		if (minsad == 0)
+			break;
 	}
 
 	r.ch = best_ch;
@@ -72,6 +75,9 @@ aatrace_match_tile_sadasd(const unsigned char* tilebuf,
 			minsadasd = sadasd;
 			best_ch = ch;
 		}
+
+		if (minsadasd == 0)
+			break;
 	}
 
 	r.ch = best_ch;

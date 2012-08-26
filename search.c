@@ -65,6 +65,9 @@ int aatrace_search_tile(const struct aatrace_pic* src,
 
 			if (r.score < best_r.score)
 				best_r = r;
+
+			if (best_r.score == 0)
+				break;
 		}
 
 	return best_r.ch;
