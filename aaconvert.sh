@@ -10,16 +10,16 @@ usage() {
     echo "Usage:"
     echo "    aaconvert.sh [OPTIONS] image.pgm"
     echo "OPTIONS:"
-    echo "  [-l <scale>] [-d <kernel>]"
+    echo "  [-l <scale>] [-d <kernel>] [-t <thresh>]"
     echo "  [-m <id>] [-W <sad>,<asd>]"
     echo "  [-s <id>] [-r (<px>|<hpx,vpx>)] [-c <1/0>]"
     exit
 }
 
-while getopts "l:d:m:W:s:r:c:" OPT
+while getopts "l:d:t:m:W:s:r:c:" OPT
 do
     case $OPT in
-	l|d)
+	l|d|t)
 	    DIFFOPTS="$DIFFOPTS -$OPT $OPTARG"
 	    DIFFSUFF="${DIFFSUFF}${OPT}${OPTARG}."
 	    ;;

@@ -5,7 +5,8 @@
 static
 void aatrace_diff2(unsigned char* d, unsigned char* s,
 		   int w, int h,
-		   unsigned int scale)
+		   unsigned int scale,
+		   unsigned int threshold)
 {
 	int l, i;
 	unsigned int D;
@@ -16,14 +17,16 @@ void aatrace_diff2(unsigned char* d, unsigned char* s,
 			  + abs(s[i + 1] - s[i] + s[i + w + 1] - s[i + w]);
 
 			D = (D*scale)/4;
-			d[i] = (D > 255) ? 255 : D;
+			D = (D > 255) ? 255 : D;
+			d[i] = (D >= threshold) ? D : 0;
 		}
 }
 
 static
 void aatrace_diff3(unsigned char* d, unsigned char* s,
 		   int w, int h,
-		   unsigned int scale)
+		   unsigned int scale,
+		   unsigned int threshold)
 {
 	int l, i;
 	unsigned int D;
@@ -39,7 +42,8 @@ void aatrace_diff3(unsigned char* d, unsigned char* s,
 				+  s[i + w + 1] - s[i + w - 1]);
 
 			D = (D*scale)/8;
-			d[i] = (D > 255) ? 255 : D;
+			D = (D > 255) ? 255 : D;
+			d[i] = (D >= threshold) ? D : 0;
 		}
 }
 
@@ -62,7 +66,8 @@ static const int diff4_Ky[4][4] =
 static
 void aatrace_diff4(unsigned char* d, unsigned char* s,
 		   int w, int h,
-		   unsigned int scale)
+		   unsigned int scale,
+		   unsigned int threshold)
 {
 	int l, i;
 	int kl, kc;
@@ -82,7 +87,8 @@ void aatrace_diff4(unsigned char* d, unsigned char* s,
 
 			D = abs(Dx) + abs(Dy);
 			D = (D*scale)/24;
-			d[i] = (D > 255) ? 255 : D;
+			D = (D > 255) ? 255 : D;
+			d[i] = (D >= threshold) ? D : 0;
 		}
 }
 
@@ -91,6 +97,7 @@ void aatrace_diff_ctx_init(struct aatrace_diff_ctx* ctx)
 {
 	ctx->scale = AATRACE_DIFF_SCALE_DEFAULT;
 	ctx->kernel = AATRACE_DEFAULT_DIFF_KERNEL;
+	ctx->threshold = AATRACE_DIFF_THRESHOLD_DEFAULT;
 }
 
 void aatrace_diff(struct aatrace_pic* dst,
@@ -109,13 +116,16 @@ void aatrace_diff(struct aatrace_pic* dst,
 		memcpy(dst->buf, src->buf, src->ll*src->h);
 		break;
 	case AATRACE_DIFF_KERNEL_2x2:
-		aatrace_diff2(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		aatrace_diff2(dst->buf, src->buf, src->ll, src->h,
+			      ctx->scale, ctx->threshold);
 		break;
 	case AATRACE_DIFF_KERNEL_3x3:
-		aatrace_diff3(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		aatrace_diff3(dst->buf, src->buf, src->ll, src->h,
+			      ctx->scale, ctx->threshold);
 		break;
 	case AATRACE_DIFF_KERNEL_4x4:
-		aatrace_diff4(dst->buf, src->buf, src->ll, src->h, ctx->scale);
+		aatrace_diff4(dst->buf, src->buf, src->ll, src->h,
+			      ctx->scale, ctx->threshold);
 		break;
 	}
 }

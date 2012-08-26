@@ -20,6 +20,9 @@ enum aatrace_diff_kernel {
 
 #define AATRACE_DEFAULT_DIFF_KERNEL AATRACE_DIFF_KERNEL_3x3
 
+/* Gradiant map detection threshold */
+#define AATRACE_DIFF_THRESHOLD_DEFAULT 64
+
 /* Image tile to font characters matching method */
 enum aatrace_match_method {
 	AATRACE_MATCH_METHOD_DEFAULT,
@@ -75,6 +78,7 @@ struct aatrace_diff_ctx
 {
 	enum aatrace_diff_kernel kernel;
 	unsigned int scale;
+	unsigned int threshold;
 };
 
 struct aatrace_match_ctx

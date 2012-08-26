@@ -42,6 +42,16 @@ Available kernel sizes: 2, 3, 4.
 The default is 3 (Sobel operator).
 Specifying 1 skips the differentiation step entirely (aalib-style).
 
+-t <thresh> - differentiation map feature detection threshold
+
+Differentiation map features weaker than threshold are removed
+from the output. Adjust the detail/noise sensitivity.
+Thresholding is applied after scaling transform so that the output value
+range only depends on the threshold.
+Specify an integer in the range 0..255.
+
+The current default is 64.
+
 B. Matching options
 
 -m <id> - match method
@@ -116,7 +126,7 @@ AAFONT environment variable overrides the default the font image.
 
 Generate the differentiated image:
 
-$ ./testdiff [-l <scale>] [-d <kernel>] image.pgm image.diff.pgm
+$ ./testdiff [-l <scale>] [-d <kernel>] [-t <thresh>] image.pgm image.diff.pgm
 
 Generate ASCII text file from the differentiated image:
 
@@ -153,6 +163,12 @@ Changing -d <kernel> adjusts the detail sensitivity level.
 Heavily oversampled images require larger kernels (4),
 while vector drawing and pixel art details are better preserved by
 smaller kernels (2). 3 is a reasonable default.
+
+Changing -t <thresh> adjusts weak detail/noise sensitivity level.
+Raising the threshold over the default 64 results in cleaner image,
+but it retains less features.
+High threshold value can speed up conversion considerably by
+removing unnecessary detail and simplifying match decision process.
 
 Changing -m <method> affects the match search strategy:
   * SAD (1) looks for the most similar character representation.

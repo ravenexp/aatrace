@@ -9,7 +9,7 @@
 
 static const char usage[] =
 "Usage:\n"
-"    testdiff [-l <scale>] [-d <kernel>] input.pgm output.pgm";
+"    testdiff [-l <scale>] [-d <kernel>] [-t <thresh>] input.pgm output.pgm";
 
 int main(int argc, char* argv[])
 {
@@ -19,13 +19,16 @@ int main(int argc, char* argv[])
 
 	aatrace_diff_ctx_init(&ctx);
 
-	while ((c = getopt(argc, argv, ":l:d:")) != -1) {
+	while ((c = getopt(argc, argv, ":l:d:t:")) != -1) {
 		switch(c) {
 		case 'l':
 			ctx.scale = atoi(optarg);
 			break;
 		case 'd':
 			ctx.kernel = (enum aatrace_diff_kernel)atoi(optarg);
+			break;
+		case 't':
+			ctx.threshold = (unsigned)atoi(optarg);
 			break;
 		case ':':
 			fprintf(stderr, "Option -%c requires an operand\n", optopt);
