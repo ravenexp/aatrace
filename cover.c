@@ -30,18 +30,22 @@ aatrace_cover_tile_score(const struct aatrace_pic* pic,
 {
 	const unsigned char* p =
 		pic->buf + font->h*pic->ll*tl + font->w*tc;
-
 	unsigned int score = 0;
+	int i;
 
-	if (dy == 1)
-		score += edge_score(p, FW, 1, ctx);
-	if (dy == -1)
-		score += edge_score(p + (font->h - 1)*pic->ll, FW, 1, ctx);
+	if (dy > 0)
+		for (i = 0; i < dy; i++)
+			score += edge_score(p + i*pic->ll, FW, 1, ctx);
+	if (dy < 0)
+		for (i = dy; i < 0; i++)
+			score += edge_score(p + (font->h + i)*pic->ll, FW, 1, ctx);
 
-	if (dx == 1)
-		score += edge_score(p, FH, pic->ll, ctx);
-	if (dx == -1)
-		score += edge_score(p + font->w - 1, FH, pic->ll, ctx);
+	if (dx > 0)
+		for (i = 0; i < dx; i++)
+			score += edge_score(p + i, FH, pic->ll, ctx);
+	if (dx < 0)
+		for (i = dx; i < 0; i++)
+			score += edge_score(p + font->w + i, FH, pic->ll, ctx);
 
 	return score;
 }
