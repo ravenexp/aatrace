@@ -36,7 +36,8 @@ enum aatrace_search_method {
 	AATRACE_SEARCH_METHOD_DEFAULT,
 	AATRACE_SEARCH_METHOD_NONE,
 	AATRACE_SEARCH_METHOD_DIAMOND,
-	AATRACE_SEARCH_METHOD_BOX
+	AATRACE_SEARCH_METHOD_BOX,
+	AATRACE_SEARCH_METHOD_AREA
 };
 
 #define AATRACE_DEFAULT_SEARCH_METHOD AATRACE_SEARCH_METHOD_NONE
@@ -44,6 +45,9 @@ enum aatrace_search_method {
 #define AATRACE_SEARCH_FLAG_COVERAGE 1
 
 #define AATRACE_DEFAULT_SEARCH_FLAGS 0
+
+#define AATRACE_DEFAULT_SEARCH_HRANGE 2
+#define AATRACE_DEFAULT_SEARCH_VRANGE 1
 
 struct aatrace_pic
 {
@@ -83,7 +87,7 @@ struct aatrace_search_ctx
 {
 	enum aatrace_search_method method;
 	unsigned int flags;
-	unsigned int range;
+	unsigned int hrange, vrange;
 };
 
 struct aatrace_convert_ctx

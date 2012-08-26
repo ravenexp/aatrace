@@ -9,8 +9,9 @@
 
 static const char usage[] =
 "Usage:\n"
-"    testconv [-m <id>] [-s <id>] [-c <1|0>] [-W <sad>.<asd>]"
-" input.pgm font.pgm output.pgm";
+"    testconv OPTIONS input.pgm font.pgm output.pgm\n"
+"OPTIONS:\n"
+"    [-m <id>] [-W <sad>,<asd>] [-s <id>] [-r (<px>|<hpx>,<vpx>)] [-c <1|0>]";
 
 int main(int argc, char* argv[])
 {
@@ -23,15 +24,29 @@ int main(int argc, char* argv[])
 
 	aatrace_convert_ctx_init(&ctx);
 
-	while ((c = getopt(argc, argv, ":m:s:c:W:")) != -1) {
+	while ((c = getopt(argc, argv, ":m:W:s:r:c:")) != -1) {
 		const char* p;
 
 		switch(c) {
 		case 'm':
 			ctx.match.method = (enum aatrace_match_method)atoi(optarg);
 			break;
+		case 'W':
+			ctx.match.sad_weight = atoi(optarg);
+			p = strchr(optarg, ',');
+			if (!p) {
+				fputs("-W requires two operands: <sad>,<asd>", stderr);
+				return 2;
+			}
+			ctx.match.asd_weight = atoi(p + 1);
+			break;
 		case 's':
 			ctx.search.method = (enum aatrace_search_method)atoi(optarg);
+			break;
+		case 'r':
+			ctx.search.hrange = (unsigned)atoi(optarg);
+			p = strchr(optarg, ',');
+			ctx.search.vrange = p ? (unsigned)atoi(p + 1) : ctx.search.hrange;
 			break;
 		case 'c':
 			if (atoi(optarg)) {
@@ -39,12 +54,6 @@ int main(int argc, char* argv[])
 			} else {
 				ctx.search.flags &= ~AATRACE_SEARCH_FLAG_COVERAGE;
 			}
-			break;
-		case 'W':
-			ctx.match.sad_weight = atoi(optarg);
-			p = strchr(optarg, '.');
-			if (p)
-				ctx.match.asd_weight = atoi(p + 1);
 			break;
 		case ':':
 			fprintf(stderr, "Option -%c requires an operand\n", optopt);

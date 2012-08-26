@@ -7,23 +7,25 @@ $ make
 while (!works)
       tweak(Makefile);
 
-2. Usage
+2. Program usage
 
 Using convenience wrapper script:
 
-$ ./aaconvert.sh [-l <scale>] [-d <kernel>] [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.pgm
+$ ./aaconvert.sh [OPTIONS] image.pgm
 
 Generates image.diff.pgm, image.ascii.txt and image.ascii.pgm files
 in the current directory.
 image.diff.pgm is an intermediate differentiated image output,
 image.ascii.txt is the text output and image.ascii.pgm is the image output.
 
-When one or more command line switches are specified they are embedded in
+When one or more command line options are specified they are embedded in
 the output file names as additional suffixes before the final file type.
 $ ./aaconvert.sh -l 5 image.pgm
 generates image.diff.l5.pgm, image.ascii.l5.txt and image.ascii.l5.pgm.
 
-Available options:
+OPTIONS
+
+A. Differentiation options
 
 -l <scale> - differentiated image levels scaling
 
@@ -39,6 +41,8 @@ Adjust the detail/noise sensitivity.
 Available kernel sizes: 2, 3, 4.
 The default is 3 (Sobel operator).
 Specifying 1 skips the differentiation step entirely (aalib-style).
+
+B. Matching options
 
 -m <id> - match method
 
@@ -56,6 +60,18 @@ Notes:
  * MIN(SAD + ASD) tries to preserve perceptible tile brightness
    as well as its shape.
 
+-W <sad>,<asd> - SAD/ASD weight ratio
+
+<sad> and <asd> parameters tune the SAD+ASD match algorithm.
+Specify two integers separated by comma ','.
+It's NOT a real number, but rather a ratio of weights <sad>/<asd>.
+Zeros are allowed and meaningful (0 and infinity).
+The matching algorithm looks for MIN(<sad>*SAD + <asd>*ASD).
+
+The default values are <sad> = 5 and <asd> = 2.
+
+C. Offset search options
+
 -s <id> - offset search method
 
 Selects the offset searching algorithm.
@@ -69,8 +85,19 @@ Available options:
      ("diamond" pattern). Runs match search 5 times.
  3 - Box search. The same as diamond + the diagonal moves are checked
      ("box" pattern). Runs match search 9 times.
+ 4 - Area search. Implements arbitrary size Box search.
+     The search area size is specified with -r option.
 
 The current default is 1 - No search.
+
+-r (<px>|<hpx>,<vpx>) - area offset search range (pixels)
+
+Only affects the Area offset search method.
+Specifies the search range(s) in both directions.
+Different ranges in horizontal and vertical directions can be
+specified with a comma (<hpx>,<vpx>).
+
+The current default is <hpx> = 2, <vpx> = 1 - 5x3 pixel area.
 
 -c <1/0> - enable/disable search coverage test
 
@@ -81,15 +108,7 @@ Can often drastically improve offset search results.
 
 The current default is 0 - disabled.
 
--W <sad>.<asd> - SAD/ASD weight ratio
-
-<sad> and <asd> parameters tune the SAD+ASD match algorithm.
-Specify two integers separated by dot ('.').
-It's NOT a real number, but rather a ratio of weights <sad>/<asd>.
-Zeros are allowed and meaningful (0 and infinity).
-The matching algorithm looks for MIN(<sad>*SAD + <asd>*ASD).
-
-The default values are <sad> = 5 and <asd> = 2.
+ENVIRONMENT VARIABLES
 
 AAFONT environment variable overrides the default the font image.
 
@@ -101,7 +120,10 @@ $ ./testdiff [-l <scale>] [-d <kernel>] image.pgm image.diff.pgm
 
 Generate ASCII text file from the differentiated image:
 
-$ ./testconv [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.diff.pgm font/font8x16.pgm image.ascii.txt
+$ ./testconv [OPTIONS] image.diff.pgm font/font8x16.pgm image.ascii.txt
+
+OPTIONS ::=
+[-m <id>] [-W <sad>,<asd>] [-s <id>] [-c <1/0>] [-r (<px>|<hpx>,<vpx>)]
 
 Render ASCII text back into an image:
 
@@ -137,13 +159,13 @@ Changing -m <method> affects the match search strategy:
   * SAD+ASD (2) tries to optimize for the overall perceptible similarity
                 at the expense of larger small-scale errors.
 
-Tweaking -W <sad>.<asd> weights ratio tunes SAD+ASD method
+Tweaking -W <sad>,<asd> weights ratio tunes SAD+ASD method
 to pay more attention to shape (SAD) or overall brightness (ASD).
 Due to the nature of the minimization problem, only the ratio of the weights is
-significant, i.e. the default -W 5.2 is the same as -W 10.4.
--W 1.0 is the same as -m 1, but slower, -W 0.1 is pure ASD (like aalib).
+significant, i.e. the default -W 5,2 is the same as -W 10,4.
+-W 1,0 is the same as -m 1, but slower, -W 0,1 is pure ASD (like aalib).
 Example:
-$ ./aaconvert.sh -l1 -d1 -W0.1 test.pgm
+$ ./aaconvert.sh -l1 -d1 -W0,1 test.pgm
 Yields the result very similar to what aalib does.
 It skips the differentiation (codes levels rather than edges) and
 uses ASD (average level) for the match search.

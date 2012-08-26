@@ -8,18 +8,22 @@ CONVOPTS=""
 
 usage() {
     echo "Usage:"
-    echo "    aaconvert.sh [-l <scale>] [-d <kernel>] [-m <id>] [-s <id>] [-c <1/0>] [-W <sad>.<asd>] image.pgm"
+    echo "    aaconvert.sh [OPTIONS] image.pgm"
+    echo "OPTIONS:"
+    echo "  [-l <scale>] [-d <kernel>]"
+    echo "  [-m <id>] [-W <sad>,<asd>]"
+    echo "  [-s <id>] [-r (<px>|<hpx,vpx>)] [-c <1/0>]"
     exit
 }
 
-while getopts "l:d:m:s:c:W:" OPT
+while getopts "l:d:m:W:s:r:c:" OPT
 do
     case $OPT in
 	l|d)
 	    DIFFOPTS="$DIFFOPTS -$OPT $OPTARG"
 	    DIFFSUFF="${DIFFSUFF}${OPT}${OPTARG}."
 	    ;;
-	m|s|c|W)
+	m|W|s|c|r)
 	    CONVOPTS="$CONVOPTS -$OPT $OPTARG"
 	    CONVSUFF="${CONVSUFF}${OPT}${OPTARG}."
 	    ;;
