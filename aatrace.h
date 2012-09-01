@@ -7,7 +7,7 @@
 /* Gradiant map scale adjustment
    1 ::= normalized to the byte range
 */
-#define AATRACE_DIFF_SCALE_DEFAULT 4
+#define AATRACE_DIFF_SCALE_DEFAULT 6
 
 /* Differentiation kernel implementation */
 enum aatrace_diff_kernel {
@@ -33,7 +33,7 @@ enum aatrace_match_method {
 #define AATRACE_DEFAULT_MATCH_METHOD AATRACE_MATCH_METHOD_MINSADASD
 
 #define AATRACE_DEFAULT_SAD_WEIGHT 5
-#define AATRACE_DEFAULT_ASD_WEIGHT 2
+#define AATRACE_DEFAULT_ASD_WEIGHT 1
 
 enum aatrace_search_method {
 	AATRACE_SEARCH_METHOD_DEFAULT,
@@ -47,10 +47,10 @@ enum aatrace_search_method {
 
 #define AATRACE_SEARCH_FLAG_COVERAGE 1
 
-#define AATRACE_DEFAULT_SEARCH_FLAGS 0
+#define AATRACE_DEFAULT_SEARCH_FLAGS 1
 
 #define AATRACE_DEFAULT_SEARCH_HRANGE 2
-#define AATRACE_DEFAULT_SEARCH_VRANGE 1
+#define AATRACE_DEFAULT_SEARCH_VRANGE 2
 
 struct aatrace_pic
 {

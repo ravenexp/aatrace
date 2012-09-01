@@ -33,7 +33,7 @@ Adjusts differential edge map "brightness".
 Specify small integer in the range of 1..20 (approx).
 1 is "normalized" is the sense that it never clips
 the values (but is too dark for most images).
-The current default is 4.
+The current default is 6.
 
 -d <kernel> - differentiation kernel (size)
 
@@ -78,7 +78,7 @@ It's NOT a real number, but rather a ratio of weights <sad>/<asd>.
 Zeros are allowed and meaningful (0 and infinity).
 The matching algorithm looks for MIN(<sad>*SAD + <asd>*ASD).
 
-The default values are <sad> = 5 and <asd> = 2.
+The default values are <sad> = 5 and <asd> = 1.
 
 C. Offset search options
 
@@ -107,16 +107,16 @@ Specifies the search range(s) in both directions.
 Different ranges in horizontal and vertical directions can be
 specified with a comma (<hpx>,<vpx>).
 
-The current default is <hpx> = 2, <vpx> = 1 - 5x3 pixel area.
+The current default is <px> = 2 (<hpx> = 2, <vpx> = 2) - 5x5 pixel area.
 
 -c <1/0> - enable/disable search coverage test
 
 Only affects offset search strategy.
 Performs match score adjustment for off-center matches to improve
 source image feature coverage by the character tiles.
-Can often drastically improve offset search results.
+Should only be disabled for search testing purposes.
 
-The current default is 0 - disabled.
+The current default is 1 - enabled.
 
 ENVIRONMENT VARIABLES
 
@@ -178,7 +178,7 @@ Changing -m <method> affects the match search strategy:
 Tweaking -W <sad>,<asd> weights ratio tunes SAD+ASD method
 to pay more attention to shape (SAD) or overall brightness (ASD).
 Due to the nature of the minimization problem, only the ratio of the weights is
-significant, i.e. the default -W 5,2 is the same as -W 10,4.
+significant, i.e. the default -W 5,1 is the same as -W 10,2.
 -W 1,0 is the same as -m 1, but slower, -W 0,1 is pure ASD (like aalib).
 Example:
 $ ./aaconvert.sh -l1 -d1 -W0,1 test.pgm
@@ -186,19 +186,19 @@ Yields the result very similar to what aalib does.
 It skips the differentiation (codes levels rather than edges) and
 uses ASD (average level) for the match search.
 
-Enabling offset search via -s 2 or -s 3 allows for better character matches
+Enabling offset search via -s 2(3,4) allows for better character matches
 at the price of small spatial jitter. This usually results in visually
 "cleaner" image. However, the search algorithm tends to avoid thin lines
 at the edges of the image tiles by stepping away from them. Skipped lines
 are not included in the match search often resulting in smaller match errors.
+Search coverage test compensates for the edge skipping effect by
+including not matched parts of the source tile in the total match error.
+Stepping away from a feature results in the same match error as matching
+it with black level.
+The coverage test should always be enabled (default) when using offset search for
+best output quality.
 Note:
 Diamond search (-s 2) checks 5 possible offsets for each tile,
 resulting in 5x slowdown compared to direct matching.
 Box (-s 3) search analyzes 9 neighboring locations, making it 9x slower.
-
-Enabling coverage test via -c 1 compensates for the edge skipping effect by
-including not matched parts of the source tile in the total match error.
-Stepping away from a feature results in the same match error as matching
-it with black level.
-The coverage test should always be enabled when using offset search for
-the best output quality.
+Area (-s 4) search with the default range (-r 2) checks 25 tile locations.
